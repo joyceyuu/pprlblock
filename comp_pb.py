@@ -352,23 +352,15 @@ for K in [100]: #[3,10,20,50,100]:
 
 # ----------------------------------------------------------------------------
     if TEST_PSIG == True:
-        def initials(rec, gname_ind, sname_ind):
-            """Extract initials as signature."""
-            WORDS = re.compile("\w+")
-            name = '{} {}'.format(rec[gname_ind][0], rec[sname_ind][0])
-            init = name
-            return init
-
-
-        psig = PPRLIndexPSignature(initials, 32, 0, 0)
+        psig = PPRLIndexPSignature(num_hash_funct=3, bf_len=1800)
         psig.load_database_alice(oz_small_alice_file_name, header_line=True,
                                rec_id_col=0, ent_id_col=0)
         psig.load_database_bob(oz_small_bob_file_name, header_line=True,
                                rec_id_col=0, ent_id_col=0)
         start_time = time.time()
-        signature_args = {'gname_ind': 1, "sname_ind": 2}
-        a_min_blk,a_med_blk,a_max_blk,a_avg_blk,a_std_dev = psig.build_index_alice(initials, signature_args)
-        b_min_blk,b_med_blk,b_max_blk,b_avg_blk,b_std_dev = psig.build_index_bob(initials, signature_args)
+        psig.common_bloom_filter([1, 2])
+        a_min_blk,a_med_blk,a_max_blk,a_avg_blk,a_std_dev = psig.build_index_alice()
+        b_min_blk,b_med_blk,b_max_blk,b_avg_blk,b_std_dev = psig.build_index_bob()
         dbo_time = time.time() - start_time
 
         start_time = time.time()
