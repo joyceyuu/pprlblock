@@ -100,6 +100,17 @@ class PPRLIndexPSignature(PPRLIndex):
         self.ngram_bob_dict = ngram_dict
         return bf
 
+    def drop_toofrequent_index(self, blocksize):
+        """Drop ngram which is too frequent."""
+        alice = self.ngram_alice_dict
+        bob = self.ngram_bob_dict
+
+        new_alice = {k: v for k, v in alice.items() if len(v) < blocksize}
+        new_bob = {k: v for k, v in bob.items() if len(v) < blocksize}
+
+        self.ngram_alice_dict = new_alice
+        self.ngram_bob_dict = new_bob
+
     def common_bloom_filter(self, attr_list):
         """Intersect two bloom filter and return."""
         if self.alice_bf is None or self.bob_bf is None:

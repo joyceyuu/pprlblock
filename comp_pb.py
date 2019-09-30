@@ -365,6 +365,7 @@ for K in [100]: #[3,10,20,50,100]:
                                rec_id_col=0, ent_id_col=0)
         start_time = time.time()
         psig.common_bloom_filter([1, 2])
+        psig.drop_toofrequent_index(80)
         a_min_blk,a_med_blk,a_max_blk,a_avg_blk,a_std_dev = psig.build_index_alice()
         b_min_blk,b_med_blk,b_max_blk,b_avg_blk,b_std_dev = psig.build_index_bob()
         dbo_time = time.time() - start_time
@@ -654,4 +655,4 @@ for K in [100]: #[3,10,20,50,100]:
     df = df.set_index('Method').T
     print()
     print(df)
-    df.to_csv('result.csv')
+    df.to_csv('result.csv', index_label='Method')
