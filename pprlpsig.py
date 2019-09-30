@@ -39,54 +39,6 @@ class PPRLIndexPSignature(PPRLIndex):
         self.ngram_alice_dict = {}
         self.ngram_bob_dict = {}
 
-
-    def __str2bf__(self, s, do_cache=False):
-        """Convert a single string into a Bloom filter (a set with the index
-           values of the bits set to 1 according to the given Bloom filter length.
-
-           This method returns the generated Bloom filter as a set.
-
-           If do_cache is set to True then the Bloom filter for this string will
-           be stored.
-        """
-        if (s in self.bf_cache):
-          return self.bf_cache[s]
-
-        h1 =             hashlib.sha1
-        h2 =             hashlib.md5
-        num_hash_funct = self.num_hash_funct
-
-        q_minus_1 = QGRAM_LEN - 1
-
-        if (QGRAM_PADDING == True):
-          ps = PADDING_START_CHAR*q_minus_1 + s + PADDING_END_CHAR*q_minus_1
-        else:
-          ps = s
-
-        q_gram_list = [ps[i:i+QGRAM_LEN] for i in range(len(ps) - q_minus_1)]
-
-        bloom_set = set()
-
-        for q in q_gram_list:
-
-          hex_str1 = h1(q.encode('utf-8')).hexdigest()
-          int1 =     int(hex_str1, 16)
-
-          hex_str2 = h2(q.encode('utf-8')).hexdigest()
-          int2 =     int(hex_str2, 16)
-
-          for i in range(num_hash_funct):
-            gi = int1 + i*int2
-            gi = int(gi % self.bf_len)
-
-            bloom_set.add(gi)
-
-        if (do_cache == True):  # Store in cache
-         self.bf_cache[s] = bloom_set
-
-        return bloom_set
-
-
     def ngram2bf(self, ngram):
         """Convert a ngram to bloom filter set."""
         h1 = hashlib.sha1
@@ -102,7 +54,6 @@ class PPRLIndexPSignature(PPRLIndex):
             gi = int(gi % self.bf_len)
             bloom_set.add(gi)
         return bloom_set
-
 
     def create_bloom_filter(self, ngrams):
         """Create Bloom filter on set of ngrams."""
@@ -210,35 +161,3 @@ class PPRLIndexPSignature(PPRLIndex):
         self.block_dict = block_dict
         print('Final indexing contains %d blocks' % (len(block_dict)))
         return len(block_dict)
-
-
-# def initials(rec, gname_ind, sname_ind):
-#     """Extract initials as signature."""
-#     WORDS = re.compile("\w+")
-#     name = '{} {}'.format(rec[gname_ind][0], rec[sname_ind][0])
-#     init = name
-#     return init
-#
-
-# oz_small_alice_file_name = './datasets/1730_50_overlap_no_mod_alice.csv.gz'
-# oz_small_bob_file_name = './datasets/1730_50_overlap_no_mod_bob.csv.gz'
-# psig = PPRLIndexPSignature(num_hash_funct=3, bf_len=1800)
-# psig.load_database_alice(oz_small_alice_file_name, header_line=True,
-#                        rec_id_col=0, ent_id_col=0)
-# psig.load_database_bob(oz_small_bob_file_name, header_line=True,
-#                        rec_id_col=0, ent_id_col=0)
-# psig.common_bloom_filter([1, 2])
-# psig.build_index_alice()
-# psig.build_index_bob()
-# alice = psig.rec_dict_alice
-# rec = alice['3461']
-# attr_list = [1, 2]
-# value = [rec[x] for x in attr_list]
-#
-# gramalice = psig.get_ngram(psig.rec_dict_alice, attr_list)
-# grambob = psig.get_ngram(psig.rec_dict_bob, attr_list)
-#
-# balice = psig.alice_bloom_filter(attr_list)
-# bbob = psig.bob_bloom_filter(attr_list)
-# common_bf = psig.common_bloom_filter(attr_list)
-# import IPython; IPython.embed()

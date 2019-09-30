@@ -341,7 +341,13 @@ for K in [100]: #[3,10,20,50,100]:
         rr, pc, pq, num_cand_rec_pairs = knn.assess_blocks()
 
 
-        assess_results['knn'] = [dbo_time, lu_time, rr, pc, pq, num_cand_rec_pairs]
+        assess_results['knn'] = [
+            alice_num_recs, bob_num_recs, num_ref_val, K,
+            dbo_time, lu_time, rr, pc, pq,
+            a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
+            b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
+            num_blocks, num_cand_rec_pairs
+        ]
         write_results('./logs/kNN.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                       dbo_time, lu_time, rr, pc, pq,
                       a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
@@ -367,7 +373,13 @@ for K in [100]: #[3,10,20,50,100]:
         num_blocks = psig.generate_blocks()
         lu_time = time.time() - start_time
         rr, pc, pq, num_cand_rec_pairs = psig.assess_blocks()
-        assess_results['psig'] = [dbo_time, lu_time, rr, pc, pq, num_cand_rec_pairs]
+        assess_results['psig'] = [
+            alice_num_recs, bob_num_recs, num_ref_val, K,
+            dbo_time, lu_time, rr, pc, pq,
+            a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
+            b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
+            num_blocks, num_cand_rec_pairs
+        ]
 
         write_results('./logs/PSig.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                       dbo_time, lu_time, rr, pc, pq,
@@ -404,7 +416,13 @@ for K in [100]: #[3,10,20,50,100]:
       lu_time = time.time() - start_time
       rr, pc, pq, num_cand_rec_pairs = sn.assess_blocks()
 
-      assess_results['snn_sim'] = [dbo_time, lu_time, rr, pc, pq, num_cand_rec_pairs]
+      assess_results['snn_sim'] = [
+          alice_num_recs, bob_num_recs, num_ref_val, K,
+          dbo_time, lu_time, rr, pc, pq,
+          a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
+          b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
+          num_blocks, num_cand_rec_pairs
+      ]
       write_results('./logs/SNN_SIM.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                       dbo_time, lu_time, rr, pc, pq,
                       a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
@@ -443,7 +461,13 @@ for K in [100]: #[3,10,20,50,100]:
       lu_time = time.time() - start_time
       rr, pc, pq, num_cand_rec_pairs = sn.assess_blocks()
 
-      assess_results['snn_sim'] = [dbo_time, lu_time, rr, pc, pq, num_cand_rec_pairs]
+      assess_results['snn_sim'] = [
+          alice_num_recs, bob_num_recs, num_ref_val, K,
+          dbo_time, lu_time, rr, pc, pq,
+          a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
+          b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
+          num_blocks, num_cand_rec_pairs
+      ]
       write_results('./logs/SNN_SIZE.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                       dbo_time, lu_time, rr, pc, pq,
                       a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
@@ -480,7 +504,13 @@ for K in [100]: #[3,10,20,50,100]:
       lu_time = time.time() - start_time
       rr, pc, pq, num_cand_rec_pairs = bf.assess_blocks()
 
-      assess_results['hlsh_clust'] = [dbo_time, lu_time, rr, pc, pq, num_cand_rec_pairs]
+      assess_results['hlsh_clust'] = [
+          alice_num_recs, bob_num_recs, num_ref_val, K,
+          dbo_time, lu_time, rr, pc, pq,
+          a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
+          b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
+          num_blocks, num_cand_rec_pairs
+      ]
 
       write_results('./logs/HLSH_clust.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                       dbo_time, lu_time, rr, pc, pq,
@@ -524,7 +554,13 @@ for K in [100]: #[3,10,20,50,100]:
       num_blocks,block_time = sn.generate_blocks()
       lu_time = time.time() - start_time
       rr, pc, pq, num_cand_rec_pairs = sn.assess_blocks()
-      assess_results['snc2p'] = [dbo_time, lu_time, rr, pc, pq, num_cand_rec_pairs]
+      assess_results['snc2p'] = [
+          alice_num_recs, bob_num_recs, num_ref_val, K,
+          dbo_time, lu_time, rr, pc, pq,
+          a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
+          b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
+          num_blocks, num_cand_rec_pairs
+      ]
 
       tot_time = max(alice_time,bob_time)+block_time
       #tot_time = dbo_time + lu_time
@@ -535,12 +571,6 @@ for K in [100]: #[3,10,20,50,100]:
                       b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
                       num_blocks, num_cand_rec_pairs, '2-party sorted neighbourhood SIM'
                       )
-      # print('Quality and complexity results for :')
-      # print('  rr = %.4f' % (rr))
-      # print('  pc = %.4f' % (pc))
-      # print('  pq = %.4f' % (pq))
-      # print('  time = %.4f' % (tot_time))
-      # #print '  lu time = %.4f' % (lu_time)
 
 # ----------------------------------------------------------------------------
 
@@ -587,7 +617,13 @@ for K in [100]: #[3,10,20,50,100]:
       num_blocks = hc.generate_blocks()
       lu_time = time.time() - start_time
       rr, pc, pq, num_cand_rec_pairs = hc.assess_blocks()
-      assess_results['hclust'] = [dbo_time, lu_time, rr, pc, pq, num_cand_rec_pairs]
+      assess_results['hclust'] = [
+          alice_num_recs, bob_num_recs, num_ref_val, K,
+          dbo_time, lu_time, rr, pc, pq,
+          a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
+          b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
+          num_blocks, num_cand_rec_pairs
+      ]
       write_results('./logs/hclust.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                         dbo_time, lu_time, rr, pc, pq,
                         a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
@@ -596,24 +632,6 @@ for K in [100]: #[3,10,20,50,100]:
                         )
       #tot_time = max(alice_time,bob_time)+block_time
       tot_time = dbo_time + lu_time
-      #
-      # log_str += ',%.4f,%.4f,%.4f,%.4f' % \
-      #   (tot_time, rr,pc,pq)
-      # log_str += ',%i,%.2f,%i,%.2f,%.2f' % \
-      #   (a_min_blk,a_med_blk,a_max_blk,a_avg_blk,a_std_dev)
-      # log_str += ',%i,%.2f,%i,%.2f,%.2f' % \
-      #   (b_min_blk,b_med_blk,b_max_blk,b_avg_blk,b_std_dev)
-      # log_str += ','+str(num_blocks)
-      # log_str += ','+str(num_cand_rec_pairs)
-      #
-      # out_file.write(log_str+os.linesep)
-      # out_file.close()
-      #
-      # print('Quality and complexity results for 2-party hclustering:')
-      # print('  rr = %.4f' % (rr))
-      # print('  pc = %.4f' % (pc))
-      # print('  pq = %.4f' % (pq))
-      # print('  time = %.4f' % (tot_time))
 
       out_file_name = './logs/hclust_noise.csv'
       out_file = open(out_file_name, 'a')
@@ -627,8 +645,13 @@ for K in [100]: #[3,10,20,50,100]:
 
     # dataframe that summarize all methods
     df = pd.DataFrame.from_dict(assess_results)
-    df['Method'] = ['dbo_time', 'lu_time', 'rr', 'pc', 'pq', 'num_cand_rec_pairs']
+    df['Method'] = [
+        'alice_num_recs', 'bob_num_recs', 'num_ref_val', 'K',
+        'dbo_time', 'lu_time', 'rr', 'pc', 'pq',
+        'a_min_blk', 'a_med_blk', 'a_max_blk', 'a_avg_blk', 'a_std_dev',
+        'b_min_blk', 'b_med_blk', 'b_max_blk', 'b_avg_blk', 'b_std_dev',
+        'num_blocks', 'num_cand_rec_pairs']
     df = df.set_index('Method').T
     print()
     print(df)
-    df.to_csv('performance.csv')
+    df.to_csv('result.csv')
