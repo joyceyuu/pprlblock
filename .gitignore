@@ -5,3 +5,4 @@ data/*
 datasets/*
 logs/*
 venv/*
+*.csv
