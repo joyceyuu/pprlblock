@@ -358,14 +358,14 @@ for K in [100]: #[3,10,20,50,100]:
 
 # ----------------------------------------------------------------------------
     if TEST_PSIG == True:
-        psig = PPRLIndexPSignature(num_hash_funct=3, bf_len=1800)
+        psig = PPRLIndexPSignature(num_hash_funct=20, bf_len=1024)
         psig.load_database_alice(oz_small_alice_file_name, header_line=True,
                                rec_id_col=0, ent_id_col=0)
         psig.load_database_bob(oz_small_bob_file_name, header_line=True,
                                rec_id_col=0, ent_id_col=0)
         start_time = time.time()
         psig.common_bloom_filter([1, 2])
-        psig.drop_toofrequent_index(80)
+        psig.drop_toofrequent_index(len(psig.rec_dict_alice) * 0.03)
         a_min_blk,a_med_blk,a_max_blk,a_avg_blk,a_std_dev = psig.build_index_alice()
         b_min_blk,b_med_blk,b_max_blk,b_avg_blk,b_std_dev = psig.build_index_bob()
         dbo_time = time.time() - start_time
