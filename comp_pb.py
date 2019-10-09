@@ -63,7 +63,7 @@ HLSH_NUM_BIT = 45
 HLSH_NUM_ITER = 40
 
 # oz_file_name = 'datasets/OZ-clean-with-gname.csv'
-oz_file_name = 'data/1730_50_overlap_no_mod_alice.csv'
+oz_file_name = 'datasets/OZ-clean-with-gname.csv'
 #nc_file_name = 'datasets/ncvoter-temporal.csv'
 
 mod_test_mode = sys.argv[1]  # 'no', 'mod', 'lno', 'lmod', 'nc', 'syn', 'syn_mod', 'nc_syn', 'nc_syn_mod'
@@ -88,8 +88,22 @@ elif (mod_test_mode == 'no'):  # OZ No-mod
 
     #['./datasets/1730_25_overlap_no_mod_alice.csv.gz',
     # './datasets/1730_25_overlap_no_mod_bob.csv.gz'],
-    ['./datasets/1730_50_overlap_no_mod_alice.csv.gz',
-     './datasets/1730_50_overlap_no_mod_bob.csv.gz']]
+    # ['./datasets/1730_50_overlap_no_mod_alice.csv.gz',
+    #  './datasets/1730_50_overlap_no_mod_bob.csv.gz'],
+
+    ['./datasets/4611_50_overlap_no_mod_alice.csv',
+     './datasets/4611_50_overlap_no_mod_bob.csv'],
+
+    # ['./datasets/46116_50_overlap_no_mod_alice.csv',
+    #  './datasets/46116_50_overlap_no_mod_bob.csv'],
+    #
+    # ['./datasets/461167_50_overlap_no_mod_alice.csv',
+    #  './datasets/461167_50_overlap_no_mod_bob.csv'],
+    #
+    # ['./datasets/4611676_50_overlap_no_mod_alice.csv',
+    #  './datasets/4611676_50_overlap_no_mod_bob.csv'],
+
+    ]
     #['./datasets/1730_75_overlap_no_mod_alice.csv.gz',
     # './datasets/1730_75_overlap_no_mod_bob.csv.gz'],
 
@@ -293,6 +307,7 @@ def write_results(out_file_name, alice_num_recs, bob_num_recs, num_ref_val, K,
     print('  dbo time = %.4f' % (dbo_time))
     print('  lu time = %.4f' % (lu_time))
 
+assess_results = []
 
 for K in [100]: #[3,10,20,50,100]:
 
@@ -312,7 +327,6 @@ for K in [100]: #[3,10,20,50,100]:
     num_recs = max(alice_num_recs,bob_num_recs)
     num_ref_val = num_recs/K
 
-    assess_results = {}
     if (TEST_KANN == True):
 
         K = 3
@@ -341,13 +355,13 @@ for K in [100]: #[3,10,20,50,100]:
         rr, pc, pq, num_cand_rec_pairs = knn.assess_blocks()
 
 
-        assess_results['knn'] = [
+        assess_results.append(['knn',
             alice_num_recs, bob_num_recs, num_ref_val, K,
             dbo_time, lu_time, rr, pc, pq,
             a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
             b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
             num_blocks, num_cand_rec_pairs
-        ]
+        ])
         write_results('./logs/kNN.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                       dbo_time, lu_time, rr, pc, pq,
                       a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
@@ -365,7 +379,7 @@ for K in [100]: #[3,10,20,50,100]:
                                rec_id_col=0, ent_id_col=0)
         start_time = time.time()
         psig.common_bloom_filter([1, 2])
-        psig.drop_toofrequent_index(len(psig.rec_dict_alice) * 0.03)
+        psig.drop_toofrequent_index(len(psig.rec_dict_alice) * 0.04)
         a_min_blk,a_med_blk,a_max_blk,a_avg_blk,a_std_dev = psig.build_index_alice()
         b_min_blk,b_med_blk,b_max_blk,b_avg_blk,b_std_dev = psig.build_index_bob()
         dbo_time = time.time() - start_time
@@ -374,13 +388,13 @@ for K in [100]: #[3,10,20,50,100]:
         num_blocks = psig.generate_blocks()
         lu_time = time.time() - start_time
         rr, pc, pq, num_cand_rec_pairs = psig.assess_blocks()
-        assess_results['psig'] = [
+        assess_results.append(['psig',
             alice_num_recs, bob_num_recs, num_ref_val, K,
             dbo_time, lu_time, rr, pc, pq,
             a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
             b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
             num_blocks, num_cand_rec_pairs
-        ]
+        ])
 
         write_results('./logs/PSig.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                       dbo_time, lu_time, rr, pc, pq,
@@ -417,13 +431,14 @@ for K in [100]: #[3,10,20,50,100]:
       lu_time = time.time() - start_time
       rr, pc, pq, num_cand_rec_pairs = sn.assess_blocks()
 
-      assess_results['snn_sim'] = [
+      assess_results.append(['snn_sim',
           alice_num_recs, bob_num_recs, num_ref_val, K,
           dbo_time, lu_time, rr, pc, pq,
           a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
           b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
           num_blocks, num_cand_rec_pairs
-      ]
+      ])
+
       write_results('./logs/SNN_SIM.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                       dbo_time, lu_time, rr, pc, pq,
                       a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
@@ -462,14 +477,15 @@ for K in [100]: #[3,10,20,50,100]:
       lu_time = time.time() - start_time
       rr, pc, pq, num_cand_rec_pairs = sn.assess_blocks()
 
-      assess_results['snn_sim'] = [
+      assess_results.append(['kasn',
           alice_num_recs, bob_num_recs, num_ref_val, K,
           dbo_time, lu_time, rr, pc, pq,
           a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
           b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
           num_blocks, num_cand_rec_pairs
-      ]
-      write_results('./logs/SNN_SIZE.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
+      ])
+
+      write_results('./logs/KASN.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                       dbo_time, lu_time, rr, pc, pq,
                       a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
                       b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
@@ -505,13 +521,13 @@ for K in [100]: #[3,10,20,50,100]:
       lu_time = time.time() - start_time
       rr, pc, pq, num_cand_rec_pairs = bf.assess_blocks()
 
-      assess_results['hlsh_clust'] = [
+      assess_results.append(['hlsh_clust',
           alice_num_recs, bob_num_recs, num_ref_val, K,
           dbo_time, lu_time, rr, pc, pq,
           a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
           b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
           num_blocks, num_cand_rec_pairs
-      ]
+      ])
 
       write_results('./logs/HLSH_clust.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                       dbo_time, lu_time, rr, pc, pq,
@@ -555,13 +571,14 @@ for K in [100]: #[3,10,20,50,100]:
       num_blocks,block_time = sn.generate_blocks()
       lu_time = time.time() - start_time
       rr, pc, pq, num_cand_rec_pairs = sn.assess_blocks()
-      assess_results['snc2p'] = [
+
+      assess_results.append(['snc2p',
           alice_num_recs, bob_num_recs, num_ref_val, K,
           dbo_time, lu_time, rr, pc, pq,
           a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
           b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
           num_blocks, num_cand_rec_pairs
-      ]
+      ])
 
       tot_time = max(alice_time,bob_time)+block_time
       #tot_time = dbo_time + lu_time
@@ -618,13 +635,15 @@ for K in [100]: #[3,10,20,50,100]:
       num_blocks = hc.generate_blocks()
       lu_time = time.time() - start_time
       rr, pc, pq, num_cand_rec_pairs = hc.assess_blocks()
-      assess_results['hclust'] = [
+
+      assess_results.append(['hclust',
           alice_num_recs, bob_num_recs, num_ref_val, K,
           dbo_time, lu_time, rr, pc, pq,
           a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
           b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
           num_blocks, num_cand_rec_pairs
-      ]
+      ])
+
       write_results('./logs/hclust.csv', alice_num_recs, bob_num_recs, num_ref_val, K,
                         dbo_time, lu_time, rr, pc, pq,
                         a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
@@ -644,15 +663,15 @@ for K in [100]: #[3,10,20,50,100]:
       print(au_list, bu_list)
       out_file.close()
 
-    # dataframe that summarize all methods
-    df = pd.DataFrame.from_dict(assess_results)
-    df['Method'] = [
-        'alice_num_recs', 'bob_num_recs', 'num_ref_val', 'K',
-        'dbo_time', 'lu_time', 'rr', 'pc', 'pq',
-        'a_min_blk', 'a_med_blk', 'a_max_blk', 'a_avg_blk', 'a_std_dev',
-        'b_min_blk', 'b_med_blk', 'b_max_blk', 'b_avg_blk', 'b_std_dev',
-        'num_blocks', 'num_cand_rec_pairs']
-    df = df.set_index('Method').T
-    print()
-    print(df)
-    df.to_csv('result.csv', index_label='Method')
+# dataframe that summarize all methods
+df = pd.DataFrame(data=assess_results)
+df.columns = ['Method',
+    'alice_num_recs', 'bob_num_recs', 'num_ref_val', 'K',
+    'dbo_time', 'lu_time', 'rr', 'pc', 'pq',
+    'a_min_blk', 'a_med_blk', 'a_max_blk', 'a_avg_blk', 'a_std_dev',
+    'b_min_blk', 'b_med_blk', 'b_max_blk', 'b_avg_blk', 'b_std_dev',
+    'num_blocks', 'num_cand_rec_pairs']
+print()
+print(df)
+df.to_csv('result.csv', index=False)
+import IPython; IPython.embed()
