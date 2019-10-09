@@ -105,8 +105,8 @@ class PPRLIndexPSignature(PPRLIndex):
         alice = self.ngram_alice_dict
         bob = self.ngram_bob_dict
 
-        new_alice = {k: v for k, v in alice.items() if len(v) < blocksize}
-        new_bob = {k: v for k, v in bob.items() if len(v) < blocksize}
+        new_alice = {k: v for k, v in alice.items() if len(v) <= blocksize}
+        new_bob = {k: v for k, v in bob.items() if len(v) <= blocksize}
 
         self.ngram_alice_dict = new_alice
         self.ngram_bob_dict = new_bob
