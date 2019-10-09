@@ -1,6 +1,7 @@
 import gzip
 import math
 import random
+from tqdm import tqdm
 
 
 class PPRLIndex:
@@ -452,8 +453,9 @@ class PPRLIndex:
       block_num = 0
 
       num_cand_rec_pairs = 0
-      for (block_key, block_data) in block_dict.items():
-        print('Processing block %d of %d' % (block_num, num_blocks))
+      for (block_key, block_data) in tqdm(block_dict.items()):
+        # if i % 100 == 0:
+        #     print('Processing block %d of %d' % (block_num, num_blocks))
         alice_rec_id_list = block_data[0]
         bob_rec_id_list =   block_data[1]
         cand_pairs_list = len(alice_rec_id_list) * len(bob_rec_id_list)
@@ -465,8 +467,9 @@ class PPRLIndex:
 
       # Calculate number of true and false matches in candidate record pairs
       #
-      for (block_key, block_data) in block_dict.items():
-        print('Processing block %d of %d' % (block_num, num_blocks))
+      for (block_key, block_data) in tqdm(block_dict.items()):
+        if block_num % 100 == 0:
+              print('Processing block %d of %d' % (block_num, num_blocks))
         alice_rec_id_list = block_data[0]
         bob_rec_id_list =   block_data[1]
 
