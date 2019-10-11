@@ -23,12 +23,12 @@ from pprlpsig import PPRLIndexPSignature
 data_sets_pairs = [
   # ['./datasets/4611_50_overlap_no_mod_alice.csv',
   #  './datasets/4611_50_overlap_no_mod_bob.csv'],
-  #
-  ['./datasets/46116_50_overlap_no_mod_alice.csv',
-   './datasets/46116_50_overlap_no_mod_bob.csv'],
+  # #
+  # ['./datasets/46116_50_overlap_no_mod_alice.csv',
+  #  './datasets/46116_50_overlap_no_mod_bob.csv'],
 
-  # ['./datasets/461167_50_overlap_no_mod_alice.csv',
-  #  './datasets/461167_50_overlap_no_mod_bob.csv'],
+  ['./datasets/461167_50_overlap_no_mod_alice.csv',
+   './datasets/461167_50_overlap_no_mod_bob.csv'],
   #
   # ['./datasets/4611676_50_overlap_no_mod_alice.csv',
   #  './datasets/4611676_50_overlap_no_mod_bob.csv'],
@@ -43,7 +43,7 @@ bf_sim =   BloomFilterSim()
 
 assess_results = []
 # drop_ratio = np.linspace(0.001, 0.6, 5)
-drop_ratio = [0.03, 0.04, 0.05]
+drop_ratio = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07]
 
 
 for (alice_data_set, bob_data_set) in data_sets_pairs:
@@ -87,28 +87,28 @@ for (alice_data_set, bob_data_set) in data_sets_pairs:
             num_blocks, num_cand_rec_pairs
         ])
 
-# dataframe that summarize all methods
-df = pd.DataFrame(data=assess_results)
-df.columns = ['Method', 'drop_ratio',
-    'alice_num_recs', 'bob_num_recs', 'num_ref_val', 'K',
-    'dbo_time', 'lu_time', 'rr', 'pc', 'pq',
-    'a_min_blk', 'a_med_blk', 'a_max_blk', 'a_avg_blk', 'a_std_dev',
-    'b_min_blk', 'b_med_blk', 'b_max_blk', 'b_avg_blk', 'b_std_dev',
-    'num_blocks', 'num_cand_rec_pairs']
-print()
-print(df)
-df.to_csv('psig.csv', index=False)
+    # dataframe that summarize all methods
+    df = pd.DataFrame(data=assess_results)
+    df.columns = ['Method', 'drop_ratio',
+        'alice_num_recs', 'bob_num_recs', 'num_ref_val', 'K',
+        'dbo_time', 'lu_time', 'rr', 'pc', 'pq',
+        'a_min_blk', 'a_med_blk', 'a_max_blk', 'a_avg_blk', 'a_std_dev',
+        'b_min_blk', 'b_med_blk', 'b_max_blk', 'b_avg_blk', 'b_std_dev',
+        'num_blocks', 'num_cand_rec_pairs']
+    print()
+    print(df)
+    df.to_csv('psig_{}.csv'.format(df['alice_num_recs'].unique()[0]), index=False)
 
 # import IPython; IPython.embed()
-res = pd.read_csv('psig.csv')
-x = res['drop_ratio'].values
-rr = res['rr'].values
-pc = res['pc'].values
-pl.figure(figsize=(8, 6))
-pl.plot(x, rr, label='reduction ratio')
-pl.plot(x, pc, label='pair completeness')
-pl.title('Reduction Ratio and Pair Completeness versus Drop Ratio (n={})'
-         .format(alice_num_recs))
-pl.grid()
-pl.legend()
-pl.show()
+# res = pd.read_csv('psig.csv')
+# x = res['drop_ratio'].values
+# rr = res['rr'].values
+# pc = res['pc'].values
+# pl.figure(figsize=(8, 6))
+# pl.plot(x, rr, label='reduction ratio')
+# pl.plot(x, pc, label='pair completeness')
+# pl.title('Reduction Ratio and Pair Completeness versus Drop Ratio (n={})'
+#          .format(alice_num_recs))
+# pl.grid()
+# pl.legend()
+# pl.show()
