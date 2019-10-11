@@ -6,3 +6,6 @@ datasets/*
 logs/*
 venv/*
 *.csv
+*.pdf
+*.png
+*.jpg
