@@ -1,10 +1,12 @@
 import matplotlib.pyplot as pl
 import pandas as pd
 import numpy as np
+import sys
 
-def blocksize():
+def blocksize(filename):
     """Draw blocksize as errorbar to see distribution."""
-    res = pd.read_csv('result.csv')
+    res = pd.read_csv(filename)
+    res = res[res['Method'].map(lambda x: x != 'hclust')]
     n = len(res)
     nm = ['{}_min_blk', '{}_med_blk', '{}_max_blk', '{}_avg_blk', '{}_std_dev']
     alice = [x.format('a') for x in nm]
@@ -45,7 +47,7 @@ def draw_ratios(res):
     shapes = ['o', 'v', 's', 'D', '*', '8']
     for x1, x2, name, marker in zip(rr, pc, methods, shapes):
         pl.plot([x1], [x2], marker=marker, linestyle='', ms=6, label=name, alpha=0.8)
-        pl.text(x1+0.001, x2 + 0.001, name, fontsize=8)
+        pl.text(x1, x2, name, fontsize=8)
     pl.xlabel('Reduction Ratio')
     pl.ylabel('Pair Completeness')
     pl.legend()
@@ -66,9 +68,36 @@ def draw_time(res):
     for i, dtime, ltime, marker, name in zip(nrange, dob_time, lu_time, shapes, methods):
         tot_time = dtime + ltime
         pl.plot(i, tot_time, marker=marker, label=name)
+        pl.text(i, tot_time, name, fontsize=8)
     methods = res['Method'].values
     pl.xticks(np.arange(n), methods)
-    pl.title('Total Running Time')
+    pl.title('Total Running Time (Log-Scale)')
+    pl.yscale('log')
+    pl.ylabel('Total Running Time (log-scale)')
     pl.grid()
 
-blocksize()
+def draw_risk(arisk, brisk, method, n):
+    """Draw disclosure risk."""
+    pl.figure(figsize=(12, 12))
+    pl.plot(sorted(arisk.values()), label='Alice')
+    pl.plot(sorted(brisk.values()), label='Bob')
+    pl.legend()
+    pl.grid()
+    pl.ylabel('Disclosure risk')
+    pl.title('Sorted Disclosure Risk of {} n={}'.format(method, n))
+    pl.savefig('{}_{}.pdf'.format(method, n))
+
+def draw_riskcompare(risks, methods, dname, n):
+    """Draw disclosure risk."""
+    pl.figure(figsize=(12, 12))
+    for risk, method in zip(risks, methods):
+        pl.plot(sorted(risk.values()), label=method)
+    pl.legend()
+    pl.grid()
+    pl.ylabel('Disclosure risk')
+    pl.title('Sorted Disclosure Risk of {} n={}'.format(dname, n))
+    pl.savefig('{}_{}.pdf'.format(dname, n))
+
+if __name__ == '__main__':
+    filename = sys.argv[1]
+    blocksize(filename)
