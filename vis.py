@@ -98,6 +98,23 @@ def draw_riskcompare(risks, methods, dname, n):
     pl.title('Sorted Disclosure Risk of {} n={}'.format(dname, n))
     pl.savefig('{}_{}.pdf'.format(dname, n))
 
+
+def draw_drop_ratio(fname):
+    """Draw reduction ratio and pair completeness for different drop ratio."""
+    res = pd.read_csv(fname)
+    x = res['drop_ratio'].values
+    rr = res['rr'].values
+    pc = res['pc'].values
+    pl.figure(figsize=(8, 6))
+    pl.plot(x, rr, label='reduction ratio')
+    pl.plot(x, pc, label='pair completeness')
+    pl.title('Reduction Ratio and Pair Completeness versus Drop Ratio (n={})'
+             .format(46116))
+    pl.grid()
+    pl.legend()
+    pl.show()
+
+
 if __name__ == '__main__':
     filename = sys.argv[1]
     blocksize(filename)
