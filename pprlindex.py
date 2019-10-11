@@ -453,7 +453,7 @@ class PPRLIndex:
       block_num = 0
 
       num_cand_rec_pairs = 0
-      for (block_key, block_data) in tqdm(block_dict.items()):
+      for (block_key, block_data) in block_dict.items():
         # if i % 100 == 0:
         #     print('Processing block %d of %d' % (block_num, num_blocks))
         alice_rec_id_list = block_data[0]
@@ -467,8 +467,9 @@ class PPRLIndex:
 
       # Calculate number of true and false matches in candidate record pairs
       #
+      block_dict_size = len(block_dict)
       for (block_key, block_data) in tqdm(block_dict.items()):
-        if block_num % 100 == 0:
+        if block_num % int(block_dict_size / 5) == 0:
               print('Processing block %d of %d' % (block_num, num_blocks))
         alice_rec_id_list = block_data[0]
         bob_rec_id_list =   block_data[1]
@@ -563,3 +564,57 @@ class PPRLIndex:
         print('  std dev:        %d' % (std_dev))
 
         return min_block_size,med_blk_size,max_block_size,avr_block_size,std_dev,blk_len_list
+
+
+  def disclosure_risk(self):
+        """Find disclosure risk sorted array back."""
+        # construct a dictionary of record and block they are in
+        alice = {}
+        bob = {}
+
+        def get_record_block_dict(dct, records, blk_id):
+            """Add records and block id to dct."""
+            for r in records:
+                if r in dct:
+                    dct[r].append(blk_id)
+                else:
+                    dct[r] = [blk_id]
+
+        for blk_id, (a_vals, b_vals) in self.block_dict.items():
+            # alice
+            get_record_block_dict(alice, a_vals, blk_id)
+            # bob
+            get_record_block_dict(bob, b_vals, blk_id)
+
+        # compute the block size
+        alice_blk_size = {k: len(v) for k, (v, _) in self.block_dict.items()}
+        bob_blk_size =  {k: len(v) for k, (_, v) in self.block_dict.items()}
+
+        # for record that only belongs to 1 block, risk=1/block size
+        alice_risk = {}
+        bob_risk = {}
+
+        def get_block_intersection(blk_ids, index):
+            """Find intersection of blocks given block ids."""
+            block_dict = self.block_dict
+            intersection = block_dict[blk_ids[0]][index]
+            for bid in blk_ids[1:]:
+                intersection = list(set(intersection) & set(block_dict[bid][index]))
+            return intersection
+
+        def create_risk(rec_blk_dict, blk_size, risk_dict, index):
+            """Construct disclosure risk dictionary."""
+            for k, blk in rec_blk_dict.items():
+                if len(blk) == 1:
+                    risk_dict[k] = 1. / blk_size[blk[0]]
+                else:
+                    # find the intersection of blocks
+                    risk_dict[k] = 1. / len(get_block_intersection(blk, index))
+
+        create_risk(alice, alice_blk_size, alice_risk, 0)
+        create_risk(bob, bob_blk_size, bob_risk, 1)
+
+        self.alice_risk = alice_risk
+        self.bob_risk = bob_risk
+
+        return alice_risk, bob_risk
