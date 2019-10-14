@@ -15,21 +15,22 @@ from itertools import tee
 import re
 import pandas as pd
 from collections import defaultdict
+import multiprocessing
 ### self dependency
 from simmeasure import DiceSim, BloomFilterSim, editdist
 from pprlindex import PPRLIndex
 from pprlpsig import PPRLIndexPSignature
 
 data_sets_pairs = [
-  # ['./datasets/4611_50_overlap_no_mod_alice.csv',
-  #  './datasets/4611_50_overlap_no_mod_bob.csv'],
-  # #
+  ['./datasets/4611_50_overlap_no_mod_alice.csv',
+   './datasets/4611_50_overlap_no_mod_bob.csv'],
+  #
   # ['./datasets/46116_50_overlap_no_mod_alice.csv',
   #  './datasets/46116_50_overlap_no_mod_bob.csv'],
 
-  ['./datasets/461167_50_overlap_no_mod_alice.csv',
-   './datasets/461167_50_overlap_no_mod_bob.csv'],
-  #
+  # ['./datasets/461167_50_overlap_no_mod_alice.csv',
+  #  './datasets/461167_50_overlap_no_mod_bob.csv'],
+  # #
   # ['./datasets/4611676_50_overlap_no_mod_alice.csv',
   #  './datasets/4611676_50_overlap_no_mod_bob.csv'],
 
@@ -46,10 +47,28 @@ assess_results = []
 drop_ratio = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07]
 
 
-for (alice_data_set, bob_data_set) in data_sets_pairs:
-    K=100
-    oz_small_alice_file_name = alice_data_set
-    oz_small_bob_file_name   = bob_data_set
+def psig_block(arg):
+    """Fit a psig with given dropout ratio."""
+    dr, oz_small_alice_file_name, oz_small_bob_file_name = arg
+    psig = PPRLIndexPSignature(num_hash_funct=20, bf_len=1024)
+    psig.load_database_alice(oz_small_alice_file_name, header_line=True,
+                           rec_id_col=0, ent_id_col=0)
+    psig.load_database_bob(oz_small_bob_file_name, header_line=True,
+                           rec_id_col=0, ent_id_col=0)
+    start_time = time.time()
+    psig.common_bloom_filter([1, 2])
+    psig.drop_toofrequent_index(len(psig.rec_dict_alice) * dr)
+    a_min_blk,a_med_blk,a_max_blk,a_avg_blk,a_std_dev = psig.build_index_alice()
+    b_min_blk,b_med_blk,b_max_blk,b_avg_blk,b_std_dev = psig.build_index_bob()
+    dbo_time = time.time() - start_time
+
+    start_time = time.time()
+    num_blocks = psig.generate_blocks()
+    lu_time = time.time() - start_time
+    rr, pc, pq, num_cand_rec_pairs = psig.assess_blocks()
+
+    K = 100
+
     # num of reference values R = N/k
     alice_dataset_str = alice_data_set.split('/')[-1]
     alice_num_recs = int(alice_dataset_str.split('_')[0])
@@ -62,42 +81,40 @@ for (alice_data_set, bob_data_set) in data_sets_pairs:
     num_recs = max(alice_num_recs,bob_num_recs)
     num_ref_val = num_recs/K
 
-    for dr in drop_ratio:
-        psig = PPRLIndexPSignature(num_hash_funct=20, bf_len=1024)
-        psig.load_database_alice(oz_small_alice_file_name, header_line=True,
-                               rec_id_col=0, ent_id_col=0)
-        psig.load_database_bob(oz_small_bob_file_name, header_line=True,
-                               rec_id_col=0, ent_id_col=0)
-        start_time = time.time()
-        psig.common_bloom_filter([1, 2])
-        psig.drop_toofrequent_index(len(psig.rec_dict_alice) * dr)
-        a_min_blk,a_med_blk,a_max_blk,a_avg_blk,a_std_dev = psig.build_index_alice()
-        b_min_blk,b_med_blk,b_max_blk,b_avg_blk,b_std_dev = psig.build_index_bob()
-        dbo_time = time.time() - start_time
-
-        start_time = time.time()
-        num_blocks = psig.generate_blocks()
-        lu_time = time.time() - start_time
-        rr, pc, pq, num_cand_rec_pairs = psig.assess_blocks()
-        assess_results.append(['psig', dr,
+    result = [
+            'psig', dr,
             alice_num_recs, bob_num_recs, num_ref_val, K,
             dbo_time, lu_time, rr, pc, pq,
             a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,
             b_min_blk, b_med_blk, b_max_blk, b_avg_blk, b_std_dev,
             num_blocks, num_cand_rec_pairs
-        ])
+    ]
+    return result
 
-    # dataframe that summarize all methods
-    df = pd.DataFrame(data=assess_results)
-    df.columns = ['Method', 'drop_ratio',
-        'alice_num_recs', 'bob_num_recs', 'num_ref_val', 'K',
-        'dbo_time', 'lu_time', 'rr', 'pc', 'pq',
-        'a_min_blk', 'a_med_blk', 'a_max_blk', 'a_avg_blk', 'a_std_dev',
-        'b_min_blk', 'b_med_blk', 'b_max_blk', 'b_avg_blk', 'b_std_dev',
-        'num_blocks', 'num_cand_rec_pairs']
-    print()
-    print(df)
-    df.to_csv('psig_{}.csv'.format(df['alice_num_recs'].unique()[0]), index=False)
+alice_data_set, bob_data_set = data_sets_pairs[0]
+
+# make a pool of processes
+nprocess = len(drop_ratio)
+pool = multiprocessing.Pool(nprocess)
+
+args = [(x, alice_data_set, bob_data_set) for x in drop_ratio]
+results = zip(*pool.map(psig_block, args))
+
+assess_results = []
+for x in results:
+    assess_results.append(x)
+
+# dataframe that summarize all methods
+df = pd.DataFrame(data=assess_results).T
+df.columns = ['Method', 'drop_ratio',
+    'alice_num_recs', 'bob_num_recs', 'num_ref_val', 'K',
+    'dbo_time', 'lu_time', 'rr', 'pc', 'pq',
+    'a_min_blk', 'a_med_blk', 'a_max_blk', 'a_avg_blk', 'a_std_dev',
+    'b_min_blk', 'b_med_blk', 'b_max_blk', 'b_avg_blk', 'b_std_dev',
+    'num_blocks', 'num_cand_rec_pairs']
+print()
+print(df)
+df.to_csv('psig_{}.csv'.format(df['alice_num_recs'].unique()[0]), index=False)
 
 # import IPython; IPython.embed()
 # res = pd.read_csv('psig.csv')
