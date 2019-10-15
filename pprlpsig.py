@@ -113,9 +113,9 @@ class PPRLIndexPSignature(PPRLIndex):
 
     def common_bloom_filter(self, attr_list):
         """Intersect two bloom filter and return."""
-        if self.alice_bf is None or self.bob_bf is None:
-            self.alice_bloom_filter(attr_list)
-            self.bob_bloom_filter(attr_list)
+        # if self.alice_bf is None or self.bob_bf is None:
+        self.alice_bloom_filter(attr_list)
+        self.bob_bloom_filter(attr_list)
         # take intersection of two sets
         common_bf = self.alice_bf.intersection(self.bob_bf)
         self.common_bf = common_bf
