@@ -48,7 +48,7 @@ TEST_KASN_SIM   =  True   # Sorted neighbourhood SIM (Vat13PAKDD - SNC3PSim)
 TEST_KASN_SIZE  =  True   # Sorted neighbourhood SIZE (Vat13PAKDD - SNC3PSize)
 TEST_BFLSH      =  True   # Bloom filter Locality Sensitive hashing (Dur12 - HLSH)
 TEST_KASN_2P_SIM = True    # Sorted neighbourhood 2Party SIM (Vat13CIKM - SNC2P)
-TEST_hClust_2P   = False   # hclustering based blocking (Kuz13 - HCLUST)
+TEST_hClust_2P   = True   # hclustering based blocking (Kuz13 - HCLUST)
 
 MIN_SIM_VAL =       0.8   # 0.9 , 0.8, 0.6 - SNN3P, SNN2P, kNN
 #K =                100
@@ -91,14 +91,14 @@ elif (mod_test_mode == 'no'):  # OZ No-mod
     # ['./datasets/1730_50_overlap_no_mod_alice.csv.gz',
     #  './datasets/1730_50_overlap_no_mod_bob.csv.gz'],
     #
-    # ['./datasets/4611_50_overlap_no_mod_alice.csv',
-    #  './datasets/4611_50_overlap_no_mod_bob.csv'],
+    ['./datasets/4611_50_overlap_no_mod_alice.csv',
+     './datasets/4611_50_overlap_no_mod_bob.csv'],
 
     # ['./datasets/46116_50_overlap_no_mod_alice.csv',
     #  './datasets/46116_50_overlap_no_mod_bob.csv'],
 
-    ['./datasets/461167_50_overlap_no_mod_alice.csv',
-     './datasets/461167_50_overlap_no_mod_bob.csv'],
+    # ['./datasets/461167_50_overlap_no_mod_alice.csv',
+    #  './datasets/461167_50_overlap_no_mod_bob.csv'],
     #
     # ['./datasets/4611676_50_overlap_no_mod_alice.csv',
     #  './datasets/4611676_50_overlap_no_mod_bob.csv'],
@@ -308,6 +308,15 @@ def write_results(out_file_name, alice_num_recs, bob_num_recs, num_ref_val, K,
     print('  lu time = %.4f' % (lu_time))
 
 
+# def experiment(pprlclass, alice_data_file, bob_data_file, args):
+#     """Experiment the PPRL blocking technique."""
+#     obj = pprlclass(**args)
+#
+#     # load data
+#     obj.load_database_alice(alice_data_file, header_line=True,
+#                             rec_id_col=0, ent_id_col=0)
+#     obj.load_database_bob(alice_data_file, header_line=True,
+#                             rec_id_col=0, ent_id_col=0)
 
 for K in [100]: #[3,10,20,50,100]:
 
@@ -378,14 +387,17 @@ for K in [100]: #[3,10,20,50,100]:
         print('Testing probability signature')
         print('------------------------------------------------')
 
-        psig = PPRLIndexPSignature(num_hash_funct=20, bf_len=1024)
+        psig = PPRLIndexPSignature(num_hash_funct=20, bf_len=2048, gram_n=3)
         psig.load_database_alice(oz_small_alice_file_name, header_line=True,
                                rec_id_col=0, ent_id_col=0)
         psig.load_database_bob(oz_small_bob_file_name, header_line=True,
                                rec_id_col=0, ent_id_col=0)
         start_time = time.time()
         psig.common_bloom_filter([1, 2])
-        psig.drop_toofrequent_index(len(psig.rec_dict_alice) * 0.04)
+        n = len(psig.rec_dict_alice)
+        dr = 0.015
+        k = 0.0002
+        psig.drop_toofrequent_index(n * dr, max(n * k, 1))
         a_min_blk,a_med_blk,a_max_blk,a_avg_blk,a_std_dev = psig.build_index_alice()
         b_min_blk,b_med_blk,b_max_blk,b_avg_blk,b_std_dev = psig.build_index_bob()
         dbo_time = time.time() - start_time
