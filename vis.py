@@ -6,7 +6,7 @@ import sys
 def blocksize(filename):
     """Draw blocksize as errorbar to see distribution."""
     res = pd.read_csv(filename)
-    res = res[res['Method'].map(lambda x: x != 'hclust')]
+    # res = res[res['Method'].map(lambda x: x != 'hclust')]
     n = len(res)
     nm = ['{}_min_blk', '{}_med_blk', '{}_max_blk', '{}_avg_blk', '{}_std_dev']
     alice = [x.format('a') for x in nm]
@@ -44,7 +44,7 @@ def draw_ratios(res):
     pc = res['pc'].values
     pq = res['pq'].values
     methods = res['Method'].values
-    shapes = ['o', 'v', 's', 'D', '*', '8']
+    shapes = ['o', 'v', 's', 'D', '*', '8', 'X']
     for x1, x2, name, marker in zip(rr, pc, methods, shapes):
         pl.plot([x1], [x2], marker=marker, linestyle='', ms=6, label=name, alpha=0.8)
         pl.text(x1, x2, name, fontsize=8)
@@ -63,7 +63,7 @@ def draw_time(res):
     dob_time = res['dbo_time'].values
     lu_time = res['lu_time'].values
     methods = res['Method'].values
-    shapes = ['o', 'v', 's', 'D', '*', '8']
+    shapes = ['o', 'v', 's', 'D', '*', '8', 'X']
     nrange = np.arange(n)
     for i, dtime, ltime, marker, name in zip(nrange, dob_time, lu_time, shapes, methods):
         tot_time = dtime + ltime
@@ -109,7 +109,7 @@ def draw_drop_ratio(fname):
     pl.plot(x, rr, label='reduction ratio')
     pl.plot(x, pc, label='pair completeness')
     pl.title('Reduction Ratio and Pair Completeness versus Drop Ratio (n={})'
-             .format(46116))
+             .format(res['alice_num_recs'].unique()[0]))
     pl.grid()
     pl.legend()
     pl.show()
