@@ -23,12 +23,12 @@ import networkx as nx
 from tqdm import tqdm
 
 data_sets_pairs = [
-  # ['./datasets/4611_50_overlap_no_mod_alice.csv',
-  #  './datasets/4611_50_overlap_no_mod_bob.csv'],
+   ['./datasets/4611_50_overlap_no_mod_alice.csv',
+    './datasets/4611_50_overlap_no_mod_bob.csv'],
   #
-  ['./datasets/46116_50_overlap_no_mod_alice.csv',
-   './datasets/46116_50_overlap_no_mod_bob.csv'],
-
+  #['./datasets/46116_50_overlap_no_mod_alice.csv',
+  # './datasets/46116_50_overlap_no_mod_bob.csv'],
+  #
   # ['./datasets/461167_50_overlap_no_mod_alice.csv',
   #  './datasets/461167_50_overlap_no_mod_bob.csv'],
   # #
@@ -37,8 +37,10 @@ data_sets_pairs = [
 
 ]
 
-oz_attr_sel_list = [1,2]
-attr_bf_sample_list = [60,40]  # Sample 50% of bits from attribute BF
+oz_attr_sel_list = [1,2,3,4]
+sig_list = ['1,0:1,1:0,0:0,1', '1,0:1,1:3,0:3,1:3,2:3,3', '1,0:1,1:2,0:2,1:2,2:3,0:3,1:3,2:3,3', '3,0:3,1:3,2:3,3']
+dr = 0.015
+k = 0.0002
 dice_sim = DiceSim()
 bf_sim =   BloomFilterSim()
 
@@ -56,15 +58,14 @@ bob_num_recs = int(bob_dataset_str.split('_')[0])
 num_recs = max(alice_num_recs,bob_num_recs)
 
 # build a P-Sig instance
-psig = PPRLIndexPSignature(num_hash_funct=20, bf_len=2048, gram_n=3)
+psig = PPRLIndexPSignature(num_hash_funct=20, bf_len=2048, sig_list=sig_list)
 psig.load_database_alice(alice_data_set, header_line=True,
                        rec_id_col=0, ent_id_col=0)
 psig.load_database_bob(bob_data_set, header_line=True,
                        rec_id_col=0, ent_id_col=0)
 psig.common_bloom_filter([1, 2])
 
-dr = 0.0015
-k = 0.00002
+
 start_time = time.time()
 n = len(psig.rec_dict_alice)
 psig.drop_toofrequent_index(n * dr, max(n * k, 1))

@@ -17,7 +17,7 @@ class PPRLIndexPSignature(PPRLIndex):
         This class includes an implmentation of p-sig algorithm.
     """
 
-    def __init__(self, num_hash_funct, bf_len, gram_n):
+    def __init__(self, num_hash_funct, bf_len, sig_list):
         """Initialize the class and set the required parameters.
 
         Arguments:
@@ -32,7 +32,7 @@ class PPRLIndexPSignature(PPRLIndex):
         """
         self.num_hash_funct = num_hash_funct
         self.bf_len = bf_len
-        self.gram_n = gram_n
+        self.sig_list = sig_list
         self.bf_cache = {}
         self.alice_bf = None
         self.bob_bf = None
@@ -64,29 +64,43 @@ class PPRLIndexPSignature(PPRLIndex):
             bloom = bloom.union(bloom_set)
         return bloom
 
-    def get_ngram(self, records, ngram_dict, attr_list):
+    def get_sig(self, records, ngram_dict):
         """Obtain N-gram of selected attributes for all records."""
         ngrams = set()
+        sig_list = self.sig_list
+
         for key, rec in records.items():
-            value = [rec[x] for x in attr_list]
-            ps = ''.join(value)
-            q_minus_1 = self.gram_n - 1
-            # add each ngram to set
-            for i in range(len(ps) - q_minus_1):
-                gram = ps[i: i + self.gram_n]
-                ngrams.add(gram)
-                if gram in ngram_dict:
-                    ngram_dict[gram].append(key)
-                else:
-                    ngram_dict[gram] = [key]
-            # # remove duplicates
-            # ngram_dict = {x: list(set(v)) for x, v in ngram_dict.items()}
-        return ngrams, ngram_dict
+            value = rec[1:]
+            for sig in sig_list:
+              sig_val = ''
+              sig_chars = sig.split(':')
+              for sig_char in sig_chars:
+                attr_index = int(sig_char.split(',')[0])
+                char_index = int(sig_char.split(',')[1])
+                print(value, sig_char, attr_index, char_index)
+                sig_val += value[attr_index][char_index]
+
+              if sig_val in ngram_dict:
+                ngram_dict[sig_val].append(key)
+              else:
+                ngram_dict[sig_val] = [sig_val]
+
+            #q_minus_1 = self.gram_n - 1
+            ## add each ngram to set
+            #for i in range(len(ps) - q_minus_1):
+            #    gram = ps[i: i + self.gram_n]
+            #    ngrams.add(gram)
+            #    if gram in ngram_dict:
+            #        ngram_dict[gram].append(key)
+            #    else:
+            #        ngram_dict[gram] = [key]
+            ## # remove duplicates
+            ## ngram_dict = {x: list(set(v)) for x, v in ngram_dict.items()}
+        return ngram_dict.keys(), ngram_dict
 
     def alice_bloom_filter(self, attr_list):
         """Create bloom filter on Alice's attributes."""
-        res = self.get_ngram(self.rec_dict_alice, self.ngram_alice_dict,
-                             attr_list)
+        res = self.get_sig(self.rec_dict_alice, self.ngram_alice_dict)
         ngrams, ngram_dict = res
         bf = self.create_bloom_filter(ngrams)
         self.alice_bf = bf
@@ -95,8 +109,7 @@ class PPRLIndexPSignature(PPRLIndex):
 
     def bob_bloom_filter(self, attr_list):
         """Create bloom filter on Bob's attributes."""
-        res = self.get_ngram(self.rec_dict_bob, self.ngram_bob_dict,
-                             attr_list)
+        res = self.get_sig(self.rec_dict_bob, self.ngram_bob_dict)
         ngrams, ngram_dict = res
         bf = self.create_bloom_filter(ngrams)
         self.bob_bf = bf
