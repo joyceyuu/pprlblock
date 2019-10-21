@@ -17,7 +17,7 @@ class PPRLIndexPSignature(PPRLIndex):
         This class includes an implmentation of p-sig algorithm.
     """
 
-    def __init__(self, num_hash_funct, bf_len):
+    def __init__(self, num_hash_funct, bf_len, gram_n):
         """Initialize the class and set the required parameters.
 
         Arguments:
@@ -32,6 +32,7 @@ class PPRLIndexPSignature(PPRLIndex):
         """
         self.num_hash_funct = num_hash_funct
         self.bf_len = bf_len
+        self.gram_n = gram_n
         self.bf_cache = {}
         self.alice_bf = None
         self.bob_bf = None
@@ -69,15 +70,17 @@ class PPRLIndexPSignature(PPRLIndex):
         for key, rec in records.items():
             value = [rec[x] for x in attr_list]
             ps = ''.join(value)
-            q_minus_1 = QGRAM_LEN - 1
+            q_minus_1 = self.gram_n - 1
             # add each ngram to set
             for i in range(len(ps) - q_minus_1):
-                gram = ps[i: i + QGRAM_LEN]
+                gram = ps[i: i + self.gram_n]
                 ngrams.add(gram)
                 if gram in ngram_dict:
                     ngram_dict[gram].append(key)
                 else:
                     ngram_dict[gram] = [key]
+            # # remove duplicates
+            # ngram_dict = {x: list(set(v)) for x, v in ngram_dict.items()}
         return ngrams, ngram_dict
 
     def alice_bloom_filter(self, attr_list):
@@ -100,13 +103,13 @@ class PPRLIndexPSignature(PPRLIndex):
         self.ngram_bob_dict = ngram_dict
         return bf
 
-    def drop_toofrequent_index(self, blocksize):
+    def drop_toofrequent_index(self, blocksize, ksize):
         """Drop ngram which is too frequent."""
         alice = self.ngram_alice_dict
         bob = self.ngram_bob_dict
 
-        new_alice = {k: v for k, v in alice.items() if len(v) <= blocksize}
-        new_bob = {k: v for k, v in bob.items() if len(v) <= blocksize}
+        new_alice = {k: v for k, v in alice.items() if len(v) <= blocksize and len(v) > ksize}
+        new_bob = {k: v for k, v in bob.items() if len(v) <= blocksize and len(v) > ksize}
 
         self.ngram_alice_dict = new_alice
         self.ngram_bob_dict = new_bob
@@ -127,7 +130,7 @@ class PPRLIndexPSignature(PPRLIndex):
         for ngram, value in ngram_dict.items():
             bf = self.ngram2bf(ngram)
             if bf.intersection(common_bf) == bf:
-                revert_index[ngram] = value
+                revert_index[ngram] = set(value)
         return revert_index
 
     def build_index_alice(self):
