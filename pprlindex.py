@@ -2,6 +2,8 @@ import gzip
 import math
 import random
 from tqdm import tqdm
+from itertools import product
+import time
 
 
 class PPRLIndex:
@@ -452,52 +454,74 @@ class PPRLIndex:
       num_blocks = len(block_dict)
       block_num = 0
 
-      num_cand_rec_pairs = 0
-      for (block_key, block_data) in block_dict.items():
-        # if i % 100 == 0:
-        #     print('Processing block %d of %d' % (block_num, num_blocks))
-        alice_rec_id_list = block_data[0]
-        bob_rec_id_list =   block_data[1]
-        cand_pairs_list = len(alice_rec_id_list) * len(bob_rec_id_list)
-        num_cand_rec_pairs += cand_pairs_list
-
-      print("Total number of record pairs:          %d" % \
-          (num_rec_alice*num_rec_bob))
-      print("Number of candidate record pairs:      %d" % (num_cand_rec_pairs))
-
-      # Calculate number of true and false matches in candidate record pairs
+      # num_cand_rec_pairs = 0
+      # cand_pairs_list
+      # for (block_key, block_data) in block_dict.items():
+      #   # if i % 100 == 0:
+      #   #     print('Processing block %d of %d' % (block_num, num_blocks))
+      #   alice_rec_id_list = block_data[0]
+      #   bob_rec_id_list =   block_data[1]
+      #   cand_pairs_list = len(alice_rec_id_list) * len(bob_rec_id_list)
+      #   num_cand_rec_pairs += cand_pairs_list
       #
-      block_dict_size = len(block_dict)
-      for (block_key, block_data) in tqdm(block_dict.items()):
-        if block_num % int(block_dict_size / 5) == 0:
-              print('Processing block %d of %d' % (block_num, num_blocks))
-        alice_rec_id_list = block_data[0]
-        bob_rec_id_list =   block_data[1]
+      # print("Total number of record pairs:          %d" % \
+      #     (num_rec_alice*num_rec_bob))
+      # print("Number of candidate record pairs:      %d" % (num_cand_rec_pairs))
+      #
+      # # Calculate number of true and false matches in candidate record pairs
+      # #
+      # block_dict_size = len(block_dict)
+      # for (block_key, block_data) in tqdm(block_dict.items()):
+      #   if block_num % int(block_dict_size / 5) == 0:
+      #         print('Processing block %d of %d' % (block_num, num_blocks))
+      #   alice_rec_id_list = block_data[0]
+      #   bob_rec_id_list =   block_data[1]
+      #
+      #   for alice_rec_id in alice_rec_id_list:
+      #
+      #     # Set of Bob's entity IDs for this one from Alice
+      #     #
+      #     alice_cache_set = cand_rec_pair_cache_dict.get(alice_rec_id, set())
+      #
+      #     ent_id_alice = rec_dict_alice[alice_rec_id][ent_id_col_alice]
+      #
+      #     for bob_rec_id in bob_rec_id_list:
+      #       if (bob_rec_id not in alice_cache_set):  # New record pair
+      #         alice_cache_set.add(bob_rec_id)
+      #
+      #         ent_id_bob = rec_dict_bob[bob_rec_id][ent_id_col_bob]
+      #         if (ent_id_alice == ent_id_bob):  # A true match
+      #           num_block_true_matches += 1
+      #         else:
+      #           num_block_false_matches += 1
+      #
+      #     cand_rec_pair_cache_dict[alice_rec_id] = alice_cache_set
+      #
+      #   block_num += 1
+      #   del alice_rec_id_list
+      #
+      # num_cand_rec_pairs = num_block_true_matches + num_block_false_matches
 
-        for alice_rec_id in alice_rec_id_list:
+      cand_pairs_time = time.time()
+      cand_pairs = set()
+      print('Finding number of candidate pairs...')
+      for i, (alice_rids, bob_rids) in block_dict.items():
+          n = len(alice_rids) * len(bob_rids)
+          print('Processing block={} number of pairs={:,}'.format(i, n))
+          for a, b in tqdm(product(alice_rids, bob_rids)):
+              cand_pairs.add((a, b))
+      delta_cand_pairs = time.time() - cand_pairs_time
+      num_cand_rec_pairs = len(cand_pairs)
+      print('Total time for calculate candidate pairs={}'.format(delta_cand_pairs))
 
-          # Set of Bob's entity IDs for this one from Alice
-          #
-          alice_cache_set = cand_rec_pair_cache_dict.get(alice_rec_id, set())
-
-          ent_id_alice = rec_dict_alice[alice_rec_id][ent_id_col_alice]
-
-          for bob_rec_id in bob_rec_id_list:
-            if (bob_rec_id not in alice_cache_set):  # New record pair
-              alice_cache_set.add(bob_rec_id)
-
-              ent_id_bob = rec_dict_bob[bob_rec_id][ent_id_col_bob]
-              if (ent_id_alice == ent_id_bob):  # A true match
-                num_block_true_matches += 1
-              else:
-                num_block_false_matches += 1
-
-          cand_rec_pair_cache_dict[alice_rec_id] = alice_cache_set
-
-        block_num += 1
-        del alice_rec_id_list
-
-      num_cand_rec_pairs = num_block_true_matches + num_block_false_matches
+      # calculate rr, pc, pq
+      num_block_true_matches = 0
+      num_block_false_matches = 0
+      for a, b in tqdm(cand_pairs):
+          if a == b:
+              num_block_true_matches += 1
+          else:
+              num_block_false_matches += 1
 
       print("Number of all true matches:            %d" % \
             (num_all_true_matches))
@@ -508,8 +532,9 @@ class PPRLIndex:
         for bob_rec_id_list in block_rec_dict.values():
           num_cand_rec_pairs += len(bob_rec_id_list)
 
-    print("Total number of record pairs:          %d" % \
-          (num_rec_alice*num_rec_bob))
+    total_rec = num_rec_alice * num_rec_bob
+
+    print("Total number of record pairs:          %d" % (total_rec))
     print("Number of candidate record pairs:      %d" % (num_cand_rec_pairs))
     print()
     print(num_all_true_matches, num_block_true_matches, num_block_false_matches)
