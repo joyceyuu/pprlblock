@@ -110,7 +110,8 @@ class PPRLIndex:
     self.ent_id_col_bob = ent_id_col
 
     self.rec_dict_bob = self.__read_csv_file__(file_name, header_line,
-                                               rec_id_col_bob)
+                     
+                          rec_id_col_bob)
     print('Loaded Bob database:   %d records' % (len(self.rec_dict_bob)))
 
   # --------------------------------------------------------------------------
@@ -504,20 +505,22 @@ class PPRLIndex:
 
       cand_pairs_time = time.time()
       cand_pairs = set()
+      #print(block_dict)
       print('Finding number of candidate pairs...')
       for i, (alice_rids, bob_rids) in block_dict.items():
           n = len(alice_rids) * len(bob_rids)
-          print('Processing block={} number of pairs={:,}'.format(i, n))
-          for a, b in tqdm(product(alice_rids, bob_rids)):
+          #print('Processing block={} number of pairs={:,}'.format(i, n))
+          for a, b in product(alice_rids, bob_rids):
               cand_pairs.add((a, b))
       delta_cand_pairs = time.time() - cand_pairs_time
+      #print(cand_pairs)
       num_cand_rec_pairs = len(cand_pairs)
       print('Total time for calculate candidate pairs={}'.format(delta_cand_pairs))
 
       # calculate rr, pc, pq
       num_block_true_matches = 0
       num_block_false_matches = 0
-      for a, b in tqdm(cand_pairs):
+      for a, b in cand_pairs:
           if a == b:
               num_block_true_matches += 1
           else:
