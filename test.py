@@ -25,11 +25,11 @@ import itertools
 from itertools import combinations
 
 data_sets_pairs = [
-  # ['./datasets/4611_50_overlap_no_mod_alice.csv',
-  #  './datasets/4611_50_overlap_no_mod_bob.csv']
-  
-  ['./datasets/46116_50_overlap_no_mod_alice.csv',
-   './datasets/46116_50_overlap_no_mod_bob.csv']
+   ['./datasets/4611_50_overlap_no_mod_alice.csv',
+    './datasets/4611_50_overlap_with_mod_bob_1.csv']
+  #
+  #['./datasets/46116_50_overlap_no_mod_alice.csv',
+  #'./datasets/46116_50_overlap_with_mod_bob_1.csv']
   #
   # ['./datasets/461167_50_overlap_no_mod_alice.csv',
   #  './datasets/461167_50_overlap_no_mod_bob.csv'],
@@ -41,8 +41,8 @@ data_sets_pairs = [
 
 oz_attr_sel_list = [1,2,3,4]
 
-dr = 0.0015
-k = 0.00002
+dr = 0.015
+k = 0.0002
 dice_sim = DiceSim()
 bf_sim =   BloomFilterSim()
 
@@ -70,7 +70,7 @@ for l in length:
     cmbs.append(list(cmb))
 print(cmbs)
 
-output_file = open('block_results.csv', 'w')
+output_file = open('block_results_4611_withomod1.csv', 'w')
 output_file.write('signature_list, rr, pc, pq, min_blocks_per_records_alice, max_blocks_per_record_alice, average_blocks_per_record_alice, min_blocks_per_records_bob, max_blocks_per_record_bob, average_blocks_per_record_bob, min_block_size_alice, median_block_size_alice, max_block_size_alice, average_block_size_alice, std_dev_block_size_alice, min_block_size_bob, median_block_size_bob, max_block_size_bob, average_block_size_bob, std_dev_block_size_bob'+os.linesep)
 
 for sig_cmb in cmbs:

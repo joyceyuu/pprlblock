@@ -85,7 +85,10 @@ class PPRLIndexPSignature(PPRLIndex):
                 if 'q' in char_index:
                   q_val = int(char_index[1:])
                   #generate q-grams
-                  val_set = [value[attr_index][i:i+q_val]+'_'+str(attr_index) for i in range(len(value[attr_index]) - (q_val-1))]  
+                  if len(value[attr_index]) < q_val:
+                    val_set = [value[attr_index]]
+                  else:
+                    val_set = [value[attr_index][i:i+q_val]+'_'+str(attr_index) for i in range(len(value[attr_index]) - (q_val-1))]  
                   for sig_val in val_set:
                     if sig_val in ngram_dict:
                       ngram_dict[sig_val].append(key)
@@ -96,7 +99,10 @@ class PPRLIndexPSignature(PPRLIndex):
                   if char_index == '*':
                     sig_val += value[attr_index]
                   else:
-                    sig_val += value[attr_index][int(char_index)]
+                    if len(value[attr_index]) < int(char_index)+1:
+                      sig_val += '?'
+                    else:
+                      sig_val += value[attr_index][int(char_index)]
 
               if sig_val != '':
                 if sig_val in ngram_dict:
