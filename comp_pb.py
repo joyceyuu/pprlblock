@@ -39,7 +39,7 @@ BLOCKING_METHODS = [
     'KASN_SIZE',  # Sorted neighbourhood SIZE (Vat13PAKDD - SNC3PSize)
     'BFLSH',  # Bloom filter Locality Sensitive hashing (Dur12 - HLSH)
     'KASN_2P_SIM',  # Sorted neighbourhood 2Party SIM (Vat13CIKM - SNC2P)
-    'HCLUST_2P'  # hclustering based blocking (Kuz13 - HCLUST)
+    # 'HCLUST_2P'  # hclustering based blocking (Kuz13 - HCLUST)
 ]
 
 MIN_SIM_VAL = 0.8  # 0.9 , 0.8, 0.6 - SNN3P, SNN2P, kNN
