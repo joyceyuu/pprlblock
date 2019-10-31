@@ -1,5 +1,6 @@
 import os
 import bisect
+from memory_profiler import profile
 
 from pprlindex import PPRLIndex
 from config import SORTED_FIRST_VAL
@@ -55,6 +56,7 @@ class PPRLIndexKAnonymousSortedNeighbour(PPRLIndex):
 
   # --------------------------------------------------------------------------
 
+  @profile
   def __sort_ref_values__(self):
     """Sort the reference values and assign an integer value (starting from 0)
        to each according to this sorting.
@@ -78,6 +80,7 @@ class PPRLIndexKAnonymousSortedNeighbour(PPRLIndex):
 
   # --------------------------------------------------------------------------
 
+  @profile
   def __generate_sorted_index__(self, rec_dict, attr_select_list):
     """Generate the blocks for the given record dictionary. Each record (its
        record identifier) is inserted into one block according to the sorting
@@ -271,7 +274,7 @@ class PPRLIndexKAnonymousSortedNeighbour(PPRLIndex):
     return block_dict
 
   # --------------------------------------------------------------------------
-
+  @profile
   def build_index_alice(self, attr_select_list):
     """Build the index for Alice assuming the sorted reference values have
        been generated.
@@ -313,7 +316,7 @@ class PPRLIndexKAnonymousSortedNeighbour(PPRLIndex):
     return min_block_size,med_blk_size,max_block_size,avr_block_size,std_dev
 
   # --------------------------------------------------------------------------
-
+  @profile
   def build_index_bob(self, attr_select_list):
     """Build the index for Bob assuming the sorted reference values have
        been generated.
@@ -351,7 +354,7 @@ class PPRLIndexKAnonymousSortedNeighbour(PPRLIndex):
       wr_file.write(str(i)+',')
     wr_file.write(os.linesep)
     wr_file.close()
-    
+
     return min_block_size,med_blk_size,max_block_size,avr_block_size,std_dev
 
   # --------------------------------------------------------------------------

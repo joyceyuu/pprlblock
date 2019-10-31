@@ -39,8 +39,8 @@ class PPRLIndexPSignature(PPRLIndex):
         self.common_bf = None
         self.ngram_alice_dict = {}
         self.ngram_bob_dict = {}
-        #self.rec_in_blocks_alice_dict = {}
-        #self.rec_in_blocks_bob_dict = {}
+        # self.rec_in_blocks_alice_dict = {}
+        # self.rec_in_blocks_bob_dict = {}
 
     def ngram2bf(self, ngram):
         """Convert a ngram to bloom filter set."""
@@ -70,54 +70,55 @@ class PPRLIndexPSignature(PPRLIndex):
         """Obtain N-gram of selected attributes for all records."""
         ngrams = set()
         sig_list = self.sig_list
-        #rec_in_blocks_dict = {}
+        # rec_in_blocks_dict = {}
 
         for key, rec in records.items():
             value = rec[1:]
             for sig in sig_list:
-              sig_val = ''
-              sig_chars = sig.split(':')
-              for sig_char in sig_chars:
-                attr_index = int(sig_char.split(',')[0])
-                char_index = sig_char.split(',')[1]
-                #print(value, sig_char, attr_index, char_index)
+                sig_val = ''
+                sig_chars = sig.split(':')
+                for sig_char in sig_chars:
+                    attr_index = int(sig_char.split(',')[0])
+                    char_index = sig_char.split(',')[1]
+                    # print(value, sig_char, attr_index, char_index)
 
-                if 'q' in char_index:
-                  q_val = int(char_index[1:])
-                  #generate q-grams
-                  if len(value[attr_index]) < q_val:
-                    val_set = [value[attr_index]]
-                  else:
-                    val_set = [value[attr_index][i:i+q_val]+'_'+str(attr_index) for i in range(len(value[attr_index]) - (q_val-1))]  
-                  for sig_val in val_set:
+                    if 'q' in char_index:
+                        q_val = int(char_index[1:])
+                        # generate q-grams
+                        if len(value[attr_index]) < q_val:
+                            val_set = [value[attr_index]]
+                        else:
+                            val_set = [value[attr_index][i:i + q_val] + '_' + str(attr_index) for i in
+                                       range(len(value[attr_index]) - (q_val - 1))]
+                        for sig_val in val_set:
+                            if sig_val in ngram_dict:
+                                ngram_dict[sig_val].append(key)
+                            else:
+                                ngram_dict[sig_val] = [key]
+
+                    else:
+                        if char_index == '*':
+                            sig_val += value[attr_index]
+                        else:
+                            if len(value[attr_index]) < int(char_index) + 1:
+                                sig_val += '?'
+                            else:
+                                sig_val += value[attr_index][int(char_index)]
+
+                if sig_val != '':
                     if sig_val in ngram_dict:
-                      ngram_dict[sig_val].append(key)
+                        ngram_dict[sig_val].append(key)
                     else:
-                      ngram_dict[sig_val] = [key]
+                        ngram_dict[sig_val] = [key]
 
-                else:
-                  if char_index == '*':
-                    sig_val += value[attr_index]
-                  else:
-                    if len(value[attr_index]) < int(char_index)+1:
-                      sig_val += '?'
-                    else:
-                      sig_val += value[attr_index][int(char_index)]
+                # if key in rec_in_blocks_dict:
+                #  rec_in_blocks_dict[key].append(sig_val)
+                # else:
+                #  rec_in_blocks_dict[key] = [sig_val]
 
-              if sig_val != '':
-                if sig_val in ngram_dict:
-                  ngram_dict[sig_val].append(key)
-                else:
-                  ngram_dict[sig_val] = [key]
-
-              #if key in rec_in_blocks_dict:
-              #  rec_in_blocks_dict[key].append(sig_val)
-              #else:
-              #  rec_in_blocks_dict[key] = [sig_val]
-
-            #q_minus_1 = self.gram_n - 1
+            # q_minus_1 = self.gram_n - 1
             ## add each ngram to set
-            #for i in range(len(ps) - q_minus_1):
+            # for i in range(len(ps) - q_minus_1):
             #    gram = ps[i: i + self.gram_n]
             #    ngrams.add(gram)
             #    if gram in ngram_dict:
@@ -126,17 +127,17 @@ class PPRLIndexPSignature(PPRLIndex):
             #        ngram_dict[gram] = [key]
             ## # remove duplicates
             ## ngram_dict = {x: list(set(v)) for x, v in ngram_dict.items()}
-        return ngram_dict.keys(), ngram_dict #, rec_in_blocks_dict
+        return ngram_dict.keys(), ngram_dict  # , rec_in_blocks_dict
 
     def alice_bloom_filter(self, attr_list):
         """Create bloom filter on Alice's attributes."""
         res = self.get_sig(self.rec_dict_alice, self.ngram_alice_dict)
-        ngrams, ngram_dict = res #, rec_in_blocks_dict = res
+        ngrams, ngram_dict = res  # , rec_in_blocks_dict = res
         bf = self.create_bloom_filter(ngrams)
         self.alice_bf = bf
         self.ngram_alice_dict = ngram_dict
 
-        #for rec in rec_in_blocks_dict:
+        # for rec in rec_in_blocks_dict:
         #  self.rec_in_blocks_alice_dict[rec] = rec_in_blocks_dict[rec]
 
         return bf
@@ -144,12 +145,12 @@ class PPRLIndexPSignature(PPRLIndex):
     def bob_bloom_filter(self, attr_list):
         """Create bloom filter on Bob's attributes."""
         res = self.get_sig(self.rec_dict_bob, self.ngram_bob_dict)
-        ngrams, ngram_dict = res #, rec_in_blocks_dict = res
+        ngrams, ngram_dict = res  # , rec_in_blocks_dict = res
         bf = self.create_bloom_filter(ngrams)
         self.bob_bf = bf
         self.ngram_bob_dict = ngram_dict
 
-        #for rec in rec_in_blocks_dict:
+        # for rec in rec_in_blocks_dict:
         #  self.rec_in_blocks_bob_dict[rec] = rec_in_blocks_dict[rec]
 
         return bf
@@ -166,40 +167,43 @@ class PPRLIndexPSignature(PPRLIndex):
         new_bob = {k: v for k, v in bob.items() if len(v) <= blocksize and len(v) > ksize}
 
         for k, v in new_alice.items():
-          for rec in v:
-            if rec in rec_in_blocks_alice_dict:
-              rec_in_blocks_alice_dict[rec].append(k)
-            else:
-              rec_in_blocks_alice_dict[rec] = [k]
+            for rec in v:
+                if rec in rec_in_blocks_alice_dict:
+                    rec_in_blocks_alice_dict[rec].append(k)
+                else:
+                    rec_in_blocks_alice_dict[rec] = [k]
 
         for k, v in new_bob.items():
-          for rec in v:
-            if rec in rec_in_blocks_bob_dict:
-              rec_in_blocks_bob_dict[rec].append(k)
-            else:
-              rec_in_blocks_bob_dict[rec] = [k]
+            for rec in v:
+                if rec in rec_in_blocks_bob_dict:
+                    rec_in_blocks_bob_dict[rec].append(k)
+                else:
+                    rec_in_blocks_bob_dict[rec] = [k]
 
-        #statistics:
+        # statistics:
         #
         alice_freq_list = []
         bob_freq_list = []
         for k, v in rec_in_blocks_alice_dict.items():
-          alice_freq_list.append(len(v))
+            alice_freq_list.append(len(v))
         for k, v in rec_in_blocks_bob_dict.items():
-          bob_freq_list.append(len(v)) 
+            bob_freq_list.append(len(v))
         if len(alice_freq_list) > 0:
-          print('Alice records in blocks: min - ',min(alice_freq_list), ' max -', max(alice_freq_list), ' avg -', float(sum(alice_freq_list)/len(alice_freq_list)))
+            print('Alice records in blocks: min - ', min(alice_freq_list), ' max -', max(alice_freq_list), ' avg -',
+                  float(sum(alice_freq_list) / len(alice_freq_list)))
         else:
-          print('Alice records in blocks: all removed')
+            print('Alice records in blocks: all removed')
         if len(bob_freq_list) > 0:
-          print('Bob records in blocks: min - ',min(bob_freq_list), ' max -', max(bob_freq_list), ' avg -', float(sum(bob_freq_list)/len(bob_freq_list)))
+            print('Bob records in blocks: min - ', min(bob_freq_list), ' max -', max(bob_freq_list), ' avg -',
+                  float(sum(bob_freq_list) / len(bob_freq_list)))
         else:
-          print('Bob records in blocks: all removed')
+            print('Bob records in blocks: all removed')
 
         self.ngram_alice_dict = new_alice
         self.ngram_bob_dict = new_bob
 
-        return min(alice_freq_list), max(alice_freq_list), float(sum(alice_freq_list)/len(alice_freq_list)), min(bob_freq_list), max(bob_freq_list), float(sum(bob_freq_list)/len(bob_freq_list))
+        return min(alice_freq_list), max(alice_freq_list), float(sum(alice_freq_list) / len(alice_freq_list)), min(
+            bob_freq_list), max(bob_freq_list), float(sum(bob_freq_list) / len(bob_freq_list))
 
     def common_bloom_filter(self, attr_list):
         """Intersect two bloom filter and return."""
@@ -230,8 +234,8 @@ class PPRLIndexPSignature(PPRLIndex):
         self.index_alice = revert_index
         alice_time = time.time() - start_time
         stat = self.block_stats(revert_index)
-        min_block_size,med_blk_size,max_block_size,avr_block_size,std_dev,blk_len_list = stat
-        return min_block_size,med_blk_size,max_block_size,avr_block_size,std_dev
+        min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev, blk_len_list = stat
+        return min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev
 
     def build_index_bob(self):
         """Build revert index for alice data."""
@@ -243,8 +247,8 @@ class PPRLIndexPSignature(PPRLIndex):
         self.index_bob = revert_index
         bob_time = time.time() - start_time
         stat = self.block_stats(revert_index)
-        min_block_size,med_blk_size,max_block_size,avr_block_size,std_dev,blk_len_list = stat
-        return min_block_size,med_blk_size,max_block_size,avr_block_size,std_dev
+        min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev, blk_len_list = stat
+        return min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev
 
     def generate_blocks(self):
         """Generates blocks based on built two index."""

@@ -1,6 +1,6 @@
 import os
 import math
-
+from memory_profiler import profile
 from pprlindex import PPRLIndex
 
 
@@ -303,7 +303,7 @@ class PPRLIndexKAnonymousNearestNeighbourClustering(PPRLIndex):
     return block_dict
 
   # --------------------------------------------------------------------------
-
+  @profile
   def build_index_alice(self, attr_select_list):
     """Build the index for Alice assuming clusters of reference values have
        been generated.
@@ -348,7 +348,7 @@ class PPRLIndexKAnonymousNearestNeighbourClustering(PPRLIndex):
     return min_block_size,med_blk_size,max_block_size,avr_block_size,std_dev
 
   # --------------------------------------------------------------------------
-
+  @profile
   def build_index_bob(self, attr_select_list):
     """Build the index for Bob assuming clusters of reference values have
        been generated.
@@ -385,11 +385,11 @@ class PPRLIndexKAnonymousNearestNeighbourClustering(PPRLIndex):
       wr_file.write(str(i)+',')
     wr_file.write(os.linesep)
     wr_file.close()
-    
+
     return min_block_size,med_blk_size,max_block_size,avr_block_size,std_dev
 
   # --------------------------------------------------------------------------
-
+  @profile
   def generate_blocks(self):
    """Method which generates the blocks based on the built two index data
       structures.
