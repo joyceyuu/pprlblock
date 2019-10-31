@@ -479,7 +479,7 @@ class PPRLIndex2PartyKAnonymousSortedNeighbour(PPRLIndex):
         wr_file.write(os.linesep)
         wr_file.close()
 
-        return min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev, alice_time
+        return min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev
 
     # --------------------------------------------------------------------------
 
@@ -530,7 +530,7 @@ class PPRLIndex2PartyKAnonymousSortedNeighbour(PPRLIndex):
         wr_file.write(os.linesep)
         wr_file.close()
 
-        return min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev, bob_time
+        return min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev
 
     # --------------------------------------------------------------------------
 

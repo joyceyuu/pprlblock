@@ -90,6 +90,7 @@ class hclustering(PPRLIndex):
             del clust[lowestpair[0]]
             del clust[lowestpair[1]]
 
+        self.clust = clust
         # print clust
         return clust
 
@@ -167,7 +168,7 @@ class hclustering(PPRLIndex):
 
     # --------------------------------------------------------------------------
 
-    def build_index_alice(self, attr_select_list, clust):
+    def build_index_alice(self, attr_select_list):
         """Build the index for Alice assuming the reference values have
        been generated.
 
@@ -179,7 +180,9 @@ class hclustering(PPRLIndex):
                            result list if it differs from all other reference
                            values).
     """
-
+        if not hasattr(self, 'clust'):
+            self.hcluster()
+        clust = self.clust
         start_time = time.time()
 
         self.attr_select_list_alice = attr_select_list
@@ -206,11 +209,11 @@ class hclustering(PPRLIndex):
         wr_file.write(os.linesep)
         wr_file.close()
 
-        return min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev, alice_time, u_list
+        return min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev
 
     # --------------------------------------------------------------------------
 
-    def build_index_bob(self, attr_select_list, clust):
+    def build_index_bob(self, attr_select_list):
         """Build the index for Bob assuming the reference values have
        been generated.
 
@@ -222,6 +225,9 @@ class hclustering(PPRLIndex):
                            result list if it differs from all other reference
                            values).
     """
+        if not hasattr(self, 'clust'):
+            self.hcluster()
+        clust = self.clust
 
         start_time = time.time()
 
@@ -249,7 +255,7 @@ class hclustering(PPRLIndex):
         wr_file.write(os.linesep)
         wr_file.close()
 
-        return min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev, bob_time, u_list
+        return min_block_size, med_blk_size, max_block_size, avr_block_size, std_dev
 
     # --------------------------------------------------------------------------
 
