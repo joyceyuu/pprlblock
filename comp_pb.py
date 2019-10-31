@@ -33,7 +33,7 @@ from simmeasure import DiceSim, BloomFilterSim, editdist
 from get_experiment_data import experiment_data
 
 BLOCKING_METHODS = [
-    'KNN',  # k-NN clustering (Kar12 - kNN)
+    # 'KNN',  # k-NN clustering (Kar12 - kNN)
     # 'PSIG',  # Probability Signature
     'KASN_SIM',  # Sorted neighbourhood SIM (Vat13PAKDD - SNC3PSim)
     'KASN_SIZE',  # Sorted neighbourhood SIZE (Vat13PAKDD - SNC3PSize)

@@ -448,6 +448,14 @@ class PPRLIndex:
             for (ent_id, ent_id_count) in alice_ent_id_dict.items():
                 num_all_true_matches += ent_id_count * bob_ent_id_dict.get(ent_id, 0)
 
+
+            # clean memory
+            del self.rec_dict_alice
+            del self.rec_dict_bob
+            del self.ref_val_list
+            del rec_dict_alice
+            del rec_dict_bob
+
             # Make sure each candidate pair is only counted once
             #
             # num_cand_rec_pairs = 0
