@@ -81,7 +81,7 @@ class PPRLIndex:
 
     # --------------------------------------------------------------------------
 
-    @profile
+    # @profile
     def load_database_alice(self, file_name, header_line=True, rec_id_col=None,
                             ent_id_col=None):
         """Load the file which contains the data of the first database owner.
@@ -99,7 +99,7 @@ class PPRLIndex:
 
     # --------------------------------------------------------------------------
 
-    @profile
+    # @profile
     def load_database_bob(self, file_name, header_line=True, rec_id_col=None,
                           ent_id_col=None):
         """Load the file which contains the data of the second database owner.
@@ -379,7 +379,7 @@ class PPRLIndex:
 
     # --------------------------------------------------------------------------
 
-    @profile
+    # @profile
     def assess_blocks(self):
         """Method which calculates the measures RR, PC and PQ for the generated
        blocks.
