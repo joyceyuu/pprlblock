@@ -246,14 +246,14 @@ for K in [100]:  # [3,10,20,50,100]:
                         sim_or_size='SIZE')
             ref_config['two_party'] = True
             experiment(PPRLIndex2PartyKAnonymousSortedNeighbour, oz_small_alice_file_name, oz_small_bob_file_name,
-                       True, ref_config, assess_results, 'k-anonymous 2-party sorted neighbourhood SIM', 'snc2p', args)
+                       True, ref_config, assess_results, 'k-anonymous 2-party sorted neighbourhood SIM', 'snc2p', args, {})
 
         # ----------------------------------------------------------------------------
 
         if 'HCLUST_2P' in BLOCKING_METHODS:
             args = dict(dist=editdist, nb=num_recs/10, wn=num_recs, ep=0.3)
             experiment(hclustering, oz_small_alice_file_name, oz_small_bob_file_name,
-                       False, None, assess_results, '2-party hclustering', 'hclust', args)
+                       False, None, assess_results, '2-party hclustering', 'hclust', args, {})
 
         # dataframe that summarize all methods
         df = pd.DataFrame(data=assess_results)

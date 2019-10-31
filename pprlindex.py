@@ -379,7 +379,7 @@ class PPRLIndex:
 
     # --------------------------------------------------------------------------
 
-    # @profile
+    @profile
     def assess_blocks(self):
         """Method which calculates the measures RR, PC and PQ for the generated
        blocks.
@@ -448,22 +448,8 @@ class PPRLIndex:
             for (ent_id, ent_id_count) in alice_ent_id_dict.items():
                 num_all_true_matches += ent_id_count * bob_ent_id_dict.get(ent_id, 0)
 
-            num_block_true_matches = 0
-            num_block_false_matches = 0
-
             # Make sure each candidate pair is only counted once
             #
-            cand_rec_pair_cache_dict = {}
-
-            num_blocks = len(block_dict)
-            block_num = 0
-
-            # clean some memory
-            self.rec_dict_alice.clear()
-            self.rec_dict_bob.clear()
-            self.index_alice.clear()
-            self.index_bob.clear()
-
             # num_cand_rec_pairs = 0
             # cand_pairs_list
             # for (block_key, block_data) in block_dict.items():
@@ -478,62 +464,62 @@ class PPRLIndex:
             #     (num_rec_alice*num_rec_bob))
             # print("Number of candidate record pairs:      %d" % (num_cand_rec_pairs))
             #
-            # # Calculate number of true and false matches in candidate record pairs
-            # #
-            # block_dict_size = len(block_dict)
-            # for (block_key, block_data) in tqdm(block_dict.items()):
-            #   if block_num % int(block_dict_size / 5) == 0:
-            #         print('Processing block %d of %d' % (block_num, num_blocks))
-            #   alice_rec_id_list = block_data[0]
-            #   bob_rec_id_list =   block_data[1]
-            #
-            #   for alice_rec_id in alice_rec_id_list:
-            #
-            #     # Set of Bob's entity IDs for this one from Alice
-            #     #
-            #     alice_cache_set = cand_rec_pair_cache_dict.get(alice_rec_id, set())
-            #
-            #     ent_id_alice = rec_dict_alice[alice_rec_id][ent_id_col_alice]
-            #
-            #     for bob_rec_id in bob_rec_id_list:
-            #       if (bob_rec_id not in alice_cache_set):  # New record pair
-            #         alice_cache_set.add(bob_rec_id)
-            #
-            #         ent_id_bob = rec_dict_bob[bob_rec_id][ent_id_col_bob]
-            #         if (ent_id_alice == ent_id_bob):  # A true match
-            #           num_block_true_matches += 1
-            #         else:
-            #           num_block_false_matches += 1
-            #
-            #     cand_rec_pair_cache_dict[alice_rec_id] = alice_cache_set
-            #
-            #   block_num += 1
-            #   del alice_rec_id_list
-            #
-            # num_cand_rec_pairs = num_block_true_matches + num_block_false_matches
 
+            # Calculate number of true and false matches in candidate record pairs
+            #
+            block_num = 0
+            num_blocks = len(block_dict)
+            cand_rec_pair_cache_dict = {}
             num_block_true_matches = 0
             num_block_false_matches = 0
-            num_cand_rec_pairs = 0
-            cand_pairs_time = time.time()
+            block_dict_size = len(block_dict)
 
             print('Finding number of candidate pairs...')
-            for i, (alice_rids, bob_rids) in block_dict.items():
+            for (block_key, block_data) in tqdm(block_dict.items()):
+                # if block_num % int(block_dict_size / 5) == 0:
+                    # print('Processing block %d of %d' % (block_num, num_blocks))
+                alice_rec_id_list = block_data[0]
+                bob_rec_id_list = block_data[1]
 
-                # remove duplicates if any
-                alice_rids = set(alice_rids)
-                bob_rids = set(bob_rids)
+                for alice_rec_id in alice_rec_id_list:
 
-                n = len(alice_rids) * len(bob_rids)
-                num_cand_rec_pairs += n
-                # print('Processing block={} number of pairs={:,}'.format(i, n))
-                for a, b in product(alice_rids, bob_rids):
-                    if a == b:
-                        num_block_true_matches += 1
-                    else:
-                        num_block_false_matches += 1
-            delta_cand_pairs = time.time() - cand_pairs_time
-            print('Total time for calculate candidate pairs={}'.format(delta_cand_pairs))
+                    # Set of Bob's entity IDs for this one from Alice
+                    #
+                    alice_cache_set = cand_rec_pair_cache_dict.get(alice_rec_id, set())
+
+                    ent_id_alice = rec_dict_alice[alice_rec_id][ent_id_col_alice]
+
+                    for bob_rec_id in bob_rec_id_list:
+                        if bob_rec_id not in alice_cache_set:  # New record pair
+                            alice_cache_set.add(bob_rec_id)
+
+                            ent_id_bob = rec_dict_bob[bob_rec_id][ent_id_col_bob]
+                            if ent_id_alice == ent_id_bob:  # A true match
+                                num_block_true_matches += 1
+                            else:
+                                num_block_false_matches += 1
+
+                    cand_rec_pair_cache_dict[alice_rec_id] = alice_cache_set
+
+                block_num += 1
+                del alice_rec_id_list
+
+            num_cand_rec_pairs = num_block_true_matches + num_block_false_matches
+            # for i, (alice_rids, bob_rids) in block_dict.items():
+            #
+            #     # remove duplicates if any
+            #     alice_rids = set(alice_rids)
+            #     bob_rids = set(bob_rids)
+            #
+            #     n = len(alice_rids) * len(bob_rids)
+            #     num_cand_rec_pairs += n
+            #     # print('Processing block={} number of pairs={:,}'.format(i, n))
+            #     for a, b in product(alice_rids, bob_rids):
+            #         if a == b:
+            #             num_block_true_matches += 1
+            #         else:
+            #             num_block_false_matches += 1
+            # print('Total time for calculate candidate pairs={}'.format(delta_cand_pairs))
 
             print("Number of all true matches:            %d" % num_all_true_matches)
 
