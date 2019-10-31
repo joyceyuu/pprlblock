@@ -176,6 +176,8 @@ def experiment(pprlclass, alice_data_file, bob_data_file, load_ref_data, ref_con
                   num_blocks, num_cand_rec_pairs,
                   name
                   )
+    # clean for memory
+    del obj
 
 
 for K in [100]:  # [3,10,20,50,100]:
@@ -234,7 +236,7 @@ for K in [100]:  # [3,10,20,50,100]:
         # ----------------------------------------------------------------------------
         if 'BFLSH' in BLOCKING_METHODS:
             args = dict(num_hash_funct=N_HASH, one_bit_set_perc=SET_BIT_PERC, random_seed=RAND_SEED)
-            build_index_args = dict(attr_bf_sample_list=ATTR_BF_SAMPLE_LIST,num_bits_hlsh=HLSH_NUM_BIT,
+            build_index_args = dict(attr_bf_sample_list=ATTR_BF_SAMPLE_LIST, num_bits_hlsh=HLSH_NUM_BIT,
                                     num_iter_hlsh=HLSH_NUM_ITER)
             experiment(PPRLIndexBloomFilterHLSH, oz_small_alice_file_name, oz_small_bob_file_name,
                        False, None, assess_results, 'Bloom filter Hamming LSH', 'bflsh_clust', args, build_index_args)
@@ -242,9 +244,12 @@ for K in [100]:  # [3,10,20,50,100]:
         # ----------------------------------------------------------------------------
 
         if 'KASN_2P_SIM' in BLOCKING_METHODS:
-            args = dict(k=K, W=W, sim_measure=dice_sim.sim, min_sim_threshold=MIN_SIM_VAL, overlap=OVERLAP,
-                        sim_or_size='SIZE')
-            ref_config['two_party'] = True
+            args = dict(k=K, w=W, sim_measure=dice_sim.sim, min_sim_threshold=MIN_SIM_VAL, overlap=OVERLAP,
+                        sim_or_size='SIM')
+            ref_config_copy = ref_config.copy()
+            ref_config_copy['two_party'] = True
+            R = 10
+            ref_config_copy['ref_vals'] = num_recs / K * R
             experiment(PPRLIndex2PartyKAnonymousSortedNeighbour, oz_small_alice_file_name, oz_small_bob_file_name,
                        True, ref_config, assess_results, 'k-anonymous 2-party sorted neighbourhood SIM', 'snc2p', args, {})
 
@@ -253,7 +258,7 @@ for K in [100]:  # [3,10,20,50,100]:
         if 'HCLUST_2P' in BLOCKING_METHODS:
             args = dict(dist=editdist, nb=num_recs/10, wn=num_recs, ep=0.3)
             experiment(hclustering, oz_small_alice_file_name, oz_small_bob_file_name,
-                       False, None, assess_results, '2-party hclustering', 'hclust', args, {})
+                       True, ref_config, assess_results, '2-party hclustering', 'hclust', args, {})
 
         # dataframe that summarize all methods
         df = pd.DataFrame(data=assess_results)
