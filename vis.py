@@ -11,7 +11,7 @@ def blocksize(filename):
     nm = ['{}_min_blk', '{}_med_blk', '{}_max_blk', '{}_avg_blk', '{}_std_dev']
     alice = [x.format('a') for x in nm]
     bob = [x.format('b') for x in nm]
-    pl.figure(figsize=(12, 12))
+    pl.figure(figsize=(15, 12))
     pl.subplot(2, 2, 1)
     draw_errorbar(n, res, alice, 'Alice')
     pl.subplot(2, 2, 2)
@@ -34,6 +34,7 @@ def draw_errorbar(n, res, nm, partyname):
                 fmt='.k', ecolor='gray', lw=1)
     methods = res['Method'].values
     pl.xticks(np.arange(n), methods)
+    pl.yscale('log')
     pl.title('Block Size Distribution of ' + partyname)
 
 
@@ -44,7 +45,7 @@ def draw_ratios(res):
     pc = res['pc'].values
     pq = res['pq'].values
     methods = res['Method'].values
-    shapes = ['o', 'v', 's', 'D', '*', '8', 'X']
+    shapes = ['o', 'v', 's', 'D', '*', '8', 'X', 'p']
     for x1, x2, name, marker in zip(rr, pc, methods, shapes):
         pl.plot([x1], [x2], marker=marker, linestyle='', ms=6, label=name, alpha=0.8)
         pl.text(x1, x2, name, fontsize=8)
@@ -63,7 +64,7 @@ def draw_time(res):
     dob_time = res['dbo_time'].values
     lu_time = res['lu_time'].values
     methods = res['Method'].values
-    shapes = ['o', 'v', 's', 'D', '*', '8', 'X']
+    shapes = ['o', 'v', 's', 'D', '*', '8', 'X', 'p']
     nrange = np.arange(n)
     for i, dtime, ltime, marker, name in zip(nrange, dob_time, lu_time, shapes, methods):
         tot_time = dtime + ltime
