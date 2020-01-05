@@ -378,8 +378,7 @@ class PPRLIndex:
         self.block_dict = {}  # To hold the generated blocks
 
     # --------------------------------------------------------------------------
-
-    @profile
+    # @profile
     def assess_blocks(self):
         """Method which calculates the measures RR, PC and PQ for the generated
        blocks.
@@ -452,7 +451,6 @@ class PPRLIndex:
             # clean memory
             del self.rec_dict_alice
             del self.rec_dict_bob
-            del self.ref_val_list
             del rec_dict_alice
             del rec_dict_bob
 
@@ -495,13 +493,14 @@ class PPRLIndex:
                     #
                     alice_cache_set = cand_rec_pair_cache_dict.get(alice_rec_id, set())
 
-                    ent_id_alice = rec_dict_alice[alice_rec_id][ent_id_col_alice]
-
+                    # ent_id_alice = rec_dict_alice[alice_rec_id][ent_id_col_alice]
+                    ent_id_alice = alice_rec_id
                     for bob_rec_id in bob_rec_id_list:
                         if bob_rec_id not in alice_cache_set:  # New record pair
                             alice_cache_set.add(bob_rec_id)
 
-                            ent_id_bob = rec_dict_bob[bob_rec_id][ent_id_col_bob]
+                            # ent_id_bob = rec_dict_bob[bob_rec_id][ent_id_col_bob]
+                            ent_id_bob = bob_rec_id
                             if ent_id_alice == ent_id_bob:  # A true match
                                 num_block_true_matches += 1
                             else:

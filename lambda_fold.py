@@ -7,14 +7,14 @@ import pandas as pd
 
 
 data_sets_pairs = [
-    ['./datasets/4611_50_overlap_no_mod_alice.csv',
-     './datasets/4611_50_overlap_no_mod_bob.csv'],
+    # ['./datasets/4611_50_overlap_no_mod_alice.csv',
+    #  './datasets/4611_50_overlap_no_mod_bob.csv'],
 
     # ['./datasets/46116_50_overlap_no_mod_alice.csv',
     #  './datasets/46116_50_overlap_no_mod_bob.csv'],
 
-    # ['./datasets/461167_50_overlap_no_mod_alice.csv',
-    #  './datasets/461167_50_overlap_no_mod_bob.csv'],
+    ['./datasets/461167_50_overlap_no_mod_alice.csv',
+     './datasets/461167_50_overlap_no_mod_bob.csv'],
 
     # ['./datasets/4611676_50_overlap_no_mod_alice.csv',
     #  './datasets/4611676_50_overlap_no_mod_bob.csv'],
@@ -52,6 +52,17 @@ config = {
     #         [
     #              {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 1},
     #              {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 2},
+    #         ],
+    #         [
+    #             {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 1},
+    #             {"type": "characters-at", "config": {"pos": [1]}, "feature-idx": 1},
+    #         ],
+    #         [
+    #             {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 2},
+    #             {"type": "characters-at", "config": {"pos": [1]}, "feature-idx": 2},
+    #         ],
+    #         [
+    #             {"type": "characters-at", "config": {"pos": [":2"]}, "feature-idx": 3},
     #         ],
     #         [
     #             {"type": "metaphone", "feature-idx": 1},
@@ -127,7 +138,7 @@ df.columns = ['Method',
               'b_min_blk', 'b_med_blk', 'b_max_blk', 'b_avg_blk', 'b_std_dev',
               'num_blocks', 'num_cand_rec_pairs']
 
-
+ddf = pd.read_csv('result2_n={}.csv'.format(num_recs_alice))
 ddf = ddf[ddf['Method'] != method_name]
 print(ddf)
 finaldf = pd.concat([ddf, df], axis=0)

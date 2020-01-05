@@ -3,6 +3,41 @@ import pandas as pd
 import numpy as np
 import sys
 
+COLORS = {
+    'k-nn': 'tab:cyan',
+    'snc-3p-sim': 'tab:blue',
+    'snc-3p-size': 'tab:orange',
+    'hlsh': 'tab:green',
+    'snc-2p': 'tab:purple',
+    'hclust': 'tab:brown',
+    'p-sig': 'tab:pink',
+    'lambda-LSH': 'tab:olive',
+}
+
+SHAPES = {
+    'k-nn': 'o',
+    'snc-3p-sim': 'v',
+    'snc-3p-size': 's',
+    'hlsh': 'D',
+    'snc-2p': '*',
+    'hclust': '8',
+    'p-sig': 'X',
+    'lambda-LSH': 'p',
+}
+
+def get_colors_and_shapes(res):
+    methods = res['Method'].values
+    shapes = [SHAPES[x] for x in methods]
+    colors = [COLORS[x] for x in methods]
+    methods = res['Method'].values
+    methods = [x.upper() for x in methods]
+    for i in range(len(methods)):
+        if 'lambda' in methods[i].lower():
+            methods[i] = r'$\Lambda$' + '-LSH'
+    print(methods)
+    return methods, shapes, colors
+
+
 def blocksize(filename):
     """Draw blocksize as errorbar to see distribution."""
     res = pd.read_csv(filename)
@@ -11,7 +46,7 @@ def blocksize(filename):
     nm = ['{}_min_blk', '{}_med_blk', '{}_max_blk', '{}_avg_blk', '{}_std_dev']
     alice = [x.format('a') for x in nm]
     bob = [x.format('b') for x in nm]
-    pl.figure(figsize=(15, 12))
+    pl.figure(figsize=(6, 6))
     pl.subplot(2, 2, 1)
     draw_errorbar(n, res, alice, 'Alice')
     pl.subplot(2, 2, 2)
@@ -32,7 +67,7 @@ def draw_errorbar(n, res, nm, partyname):
     pl.errorbar(np.arange(n), avgs, stds, fmt='ok', lw=3)
     pl.errorbar(np.arange(n), avgs, [avgs - mins, maxs - avgs],
                 fmt='.k', ecolor='gray', lw=1)
-    methods = res['Method'].values
+    methods, shapes, colors = get_colors_and_shapes(res)
     pl.xticks(np.arange(n), methods)
     pl.yscale('log')
     pl.title('Block Size Distribution of ' + partyname)
@@ -44,10 +79,9 @@ def draw_ratios(res):
     rr = res['rr'].values
     pc = res['pc'].values
     pq = res['pq'].values
-    methods = res['Method'].values
-    shapes = ['o', 'v', 's', 'D', '*', '8', 'X', 'p']
-    for x1, x2, name, marker in zip(rr, pc, methods, shapes):
-        pl.plot([x1], [x2], marker=marker, linestyle='', ms=6, label=name, alpha=0.8)
+    methods, shapes, colors = get_colors_and_shapes(res)
+    for x1, x2, name, marker, color in zip(rr, pc, methods, shapes, colors):
+        pl.plot([x1], [x2], marker=marker, linestyle='', ms=6, label=name, alpha=0.8, color=color)
         pl.text(x1, x2, name, fontsize=8)
     pl.xlabel('Reduction Ratio')
     pl.ylabel('Pair Completeness')
@@ -63,12 +97,11 @@ def draw_time(res):
     n = len(res)
     dob_time = res['dbo_time'].values
     lu_time = res['lu_time'].values
-    methods = res['Method'].values
-    shapes = ['o', 'v', 's', 'D', '*', '8', 'X', 'p']
+    methods, shapes, colors = get_colors_and_shapes(res)
     nrange = np.arange(n)
-    for i, dtime, ltime, marker, name in zip(nrange, dob_time, lu_time, shapes, methods):
+    for i, dtime, ltime, marker, name, color in zip(nrange, dob_time, lu_time, shapes, methods, colors):
         tot_time = dtime + ltime
-        pl.plot(i, tot_time, marker=marker, label=name)
+        pl.plot(i, tot_time, marker=marker, label=name, color=color)
         pl.text(i, tot_time, name, fontsize=8)
     methods = res['Method'].values
     pl.xticks(np.arange(n), methods)
@@ -118,4 +151,37 @@ def draw_drop_ratio(fname):
 
 if __name__ == '__main__':
     filename = sys.argv[1]
-    blocksize(filename)
+    # blocksize(filename)
+
+    res = pd.read_csv(filename)
+    res = res[res['Method'].map(lambda x: x != 'hclust')]
+    n = int(filename.split('=')[-1].split('.csv')[0])
+    print(n)
+    nm = ['{}_min_blk', '{}_med_blk', '{}_max_blk', '{}_avg_blk', '{}_std_dev']
+    alice = [x.format('a') for x in nm]
+    bob = [x.format('b') for x in nm]
+    pl.figure()
+    draw_errorbar(len(res), res, alice, 'Alice')
+    pl.tight_layout()
+    pl.savefig('figures/Block_Size_Boxplot_Alice_{}.eps'.format(n))
+    pl.savefig('figures/Block_Size_Boxplot_Alice_{}.pdf'.format(n))
+
+    # pl.subplot(2, 2, 2)
+
+    pl.figure(figsize=(6, 6))
+    draw_errorbar(len(res), res, bob, 'Bob')
+    pl.savefig('figures/Block_Size_Boxplot_Bob_{}.eps'.format(n))
+    pl.savefig('figures/Block_Size_Boxplot_Bob_{}.pdf'.format(n))
+
+    # pl.subplot(2, 2, 3)
+    pl.figure()
+    draw_ratios(res)
+    pl.savefig('figures/RR_versus_PC_{}.eps'.format(n))
+    pl.savefig('figures/RR_versus_PC_{}.pdf'.format(n))
+
+    # pl.subplot(2, 2, 4)
+    pl.figure()
+    draw_time(res)
+    pl.tight_layout()
+    pl.savefig('figures/Total_Running_Time_{}.eps'.format(n))
+    pl.savefig('figures/Total_Running_Time_{}.pdf'.format(n))
