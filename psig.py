@@ -13,8 +13,8 @@ data_sets_pairs = [
     # ['./datasets/46116_50_overlap_no_mod_alice.csv',
     #  './datasets/46116_50_overlap_no_mod_bob.csv'],
 
-    ['./datasets/461167_50_overlap_no_mod_alice.csv',
-     './datasets/461167_50_overlap_no_mod_bob.csv'],
+    # ['./datasets/461167_50_overlap_no_mod_alice.csv',
+    #  './datasets/461167_50_overlap_no_mod_bob.csv'],
 
     ['./datasets/4611676_50_overlap_no_mod_alice.csv',
      './datasets/4611676_50_overlap_no_mod_bob.csv'],
@@ -23,58 +23,58 @@ data_sets_pairs = [
 
 
 all_config = {
-    'lambda-fold': {
-        "type": "lambda-fold",
-        "version": 1,
-        "config": {
-            "blocking-features": [1, 2],
-            "Lambda": 5,
-            "bf-len": 2000,
-            "num-hash-funcs": 5,
-            "K": 50,
-            "random_state": 0,
-            "input-clks": False,
-        }
-    },
-    # 'p-sig': {
-    #     "type": "p-sig",
+    # 'lambda-fold': {
+    #     "type": "lambda-fold",
     #     "version": 1,
     #     "config": {
-    #         "blocking_features": [1],
-    #         # "record-id-col": 0,
-    #         "filter": {
-    #             "type": "ratio",
-    #             "max": 0.02,
-    #             "min": 0.00,
-    #         },
-    #         "blocking-filter": {
-    #             "type": "bloom filter",
-    #             "number-hash-functions": 4,
-    #             "bf-len": 2048,
-    #         },
-    #         "signatureSpecs": [
-    #             [
-    #                  {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 1},
-    #                  {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 2},
-    #             ],
-    #             [
-    #                 {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 1},
-    #                 {"type": "characters-at", "config": {"pos": [1]}, "feature-idx": 1},
-    #             ],
-    #             [
-    #                 {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 2},
-    #                 {"type": "characters-at", "config": {"pos": [1]}, "feature-idx": 2},
-    #             ],
-    #             [
-    #                 {"type": "characters-at", "config": {"pos": [":2"]}, "feature-idx": 3},
-    #             ],
-    #             [
-    #                 {"type": "metaphone", "feature-idx": 1},
-    #                 {"type": "metaphone", "feature-idx": 2},
-    #             ]
-    #         ]
+    #         "blocking-features": [1, 2],
+    #         "Lambda": 5,
+    #         "bf-len": 2000,
+    #         "num-hash-funcs": 10,
+    #         "K": 50,
+    #         "random_state": 0,
+    #         "input-clks": False,
     #     }
-    # }
+    # },
+    'p-sig': {
+        "type": "p-sig",
+        "version": 1,
+        "config": {
+            "blocking_features": [1],
+            # "record-id-col": 0,
+            "filter": {
+                "type": "count",
+                "max": 10000,
+                "min": 0.00,
+            },
+            "blocking-filter": {
+                "type": "bloom filter",
+                "number-hash-functions": 4,
+                "bf-len": 2048,
+            },
+            "signatureSpecs": [
+                [
+                     {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 1},
+                     {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 2},
+                ],
+                [
+                    {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 1},
+                    {"type": "characters-at", "config": {"pos": [1]}, "feature-idx": 1},
+                ],
+                [
+                    {"type": "characters-at", "config": {"pos": [0]}, "feature-idx": 2},
+                    {"type": "characters-at", "config": {"pos": [1]}, "feature-idx": 2},
+                ],
+                [
+                    {"type": "characters-at", "config": {"pos": [":2"]}, "feature-idx": 3},
+                ],
+                [
+                    {"type": "metaphone", "feature-idx": 1},
+                    {"type": "metaphone", "feature-idx": 2},
+                ]
+            ]
+        }
+    }
 }
 
 for config in all_config.values():

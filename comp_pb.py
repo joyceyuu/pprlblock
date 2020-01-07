@@ -35,9 +35,9 @@ from get_experiment_data import experiment_data
 BLOCKING_METHODS = [
     # 'KNN',  # k-NN clustering (Kar12 - kNN)
     # 'PSIG',  # Probability Signature
-    'KASN_SIM',  # Sorted neighbourhood SIM (Vat13PAKDD - SNC3PSim)
-    'KASN_SIZE',  # Sorted neighbourhood SIZE (Vat13PAKDD - SNC3PSize)
-    'BFLSH',  # Bloom filter Locality Sensitive hashing (Dur12 - HLSH)
+    # 'KASN_SIM',  # Sorted neighbourhood SIM (Vat13PAKDD - SNC3PSim)
+    # 'KASN_SIZE',  # Sorted neighbourhood SIZE (Vat13PAKDD - SNC3PSize)
+    # 'BFLSH',  # Bloom filter Locality Sensitive hashing (Dur12 - HLSH)
     'KASN_2P_SIM',  # Sorted neighbourhood 2Party SIM (Vat13CIKM - SNC2P)
     # 'HCLUST_2P'  # hclustering based blocking (Kuz13 - HCLUST)
 ]

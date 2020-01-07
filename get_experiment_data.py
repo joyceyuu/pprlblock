@@ -13,8 +13,8 @@ def experiment_data(mod_test_mode):
 
     elif (mod_test_mode == 'no'):  # OZ No-mod
         data_sets_pairs = [
-            ['./datasets/4611_50_overlap_no_mod_alice.csv',
-             './datasets/4611_50_overlap_no_mod_bob.csv'],
+            # ['./datasets/4611_50_overlap_no_mod_alice.csv',
+            #  './datasets/4611_50_overlap_no_mod_bob.csv'],
 
             # ['./datasets/46116_50_overlap_no_mod_alice.csv',
             #  './datasets/46116_50_overlap_no_mod_bob.csv'],
@@ -22,8 +22,8 @@ def experiment_data(mod_test_mode):
             # ['./datasets/461167_50_overlap_no_mod_alice.csv',
             #  './datasets/461167_50_overlap_no_mod_bob.csv'],
 
-            # ['./datasets/4611676_50_overlap_no_mod_alice.csv',
-            #  './datasets/4611676_50_overlap_no_mod_bob.csv'],
+            ['./datasets/4611676_50_overlap_no_mod_alice.csv',
+             './datasets/4611676_50_overlap_no_mod_bob.csv'],
 
         ]
 
