@@ -149,6 +149,26 @@ def draw_drop_ratio(fname):
     pl.show()
 
 
+def corr_rg_rr(fname):
+    """Draw reduction ratio versus reduction guarantee correlation graph."""
+    df = pd.read_csv(fname)
+    rg_max = df['RG_MAX'].values
+    rg_min = df['RG_MIN'].values
+    rg_avg = df['RG_AVG'].values
+    rr = df['RR'].values
+    pl.figure(figsize=(8, 6))
+    pl.plot(rg_max, rr, label='RG_MAX')
+    pl.plot(rg_avg, rr, label='RG_AVG')
+    pl.plot(rg_min, rr, label='RG_MIN')
+    pl.grid()
+    pl.legend()
+    pl.title('Reduction Guarantee versus Reduction Ratio')
+    pl.xlabel('Reduction Guarantee')
+    pl.ylabel('Reduction Ratio')
+    # pl.xscale('log')
+    pl.show()
+
+
 if __name__ == '__main__':
     filename = sys.argv[1]
     # blocksize(filename)

@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import pandas as pd
 import sys
-import matplotlib.pyplot as pl
+from vis import corr_rg_rr
 
 
 data_sets_pairs = [
@@ -25,24 +25,6 @@ data_sets_pairs = [
 
 ]
 
-def corr_rg_rr(fname):
-    """Draw reduction ratio versus reduction guarantee correlation graph."""
-    df = pd.read_csv(fname)
-    rg_max = df['RG_MAX'].values
-    rg_min = df['RG_MIN'].values
-    rg_avg = df['RG_AVG'].values
-    rr = df['RR'].values
-    pl.figure(figsize=(8, 6))
-    pl.plot(rg_max, rr, label='RG_MAX')
-    pl.plot(rg_avg, rr, label='RG_AVG')
-    pl.plot(rg_min, rr, label='RG_MIN')
-    pl.grid()
-    pl.legend()
-    pl.title('Reduction Guarantee versus Reduction Ratio')
-    pl.xlabel('Reduction Guarantee')
-    pl.ylabel('Reduction Ratio')
-    # pl.xscale('log')
-    pl.show()
 
 def experiment():
     max_ratio = np.linspace(0.01, 0.3, 10)
