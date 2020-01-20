@@ -3,16 +3,17 @@
 from blocklib import PPRLIndexLambdaFold
 from blocklib import generate_blocks, assess_blocks_2party, generate_candidate_blocks
 import time
+import math
 import pandas as pd
 import numpy as np
 import pandas as pd
 import sys
 from vis import corr_rg_rr
-
+mod = True
 
 data_sets_pairs = [
     ['./datasets/4611_50_overlap_no_mod_alice.csv',
-     './datasets/4611_50_overlap_no_mod_bob.csv'],
+     './datasets/4611_50_overlap_with_mod_bob_1.csv'],
 
     # ['./datasets/46116_50_overlap_no_mod_alice.csv',
     #  './datasets/46116_50_overlap_no_mod_bob.csv'],
@@ -27,7 +28,7 @@ data_sets_pairs = [
 
 
 def experiment():
-    max_ratio = np.linspace(0.01, 0.3, 10)
+    max_ratio = np.linspace(0.01, 0.02, 20)
     config = {
         "type": "p-sig",
         "version": 1,
@@ -72,6 +73,9 @@ def experiment():
     l_rg_avg = []
     l_rg_min = []
     l_rr = []
+    l_pc = []
+    l_qg_max = []
+    l_qg_avg = []
 
     # load data
     file_alice, file_bob = data_sets_pairs[0]
@@ -104,10 +108,16 @@ def experiment():
         rg_max = 1.0 - block_obj_alice.state.stats['max_size'] / num_recs_alice
         rg_avg = 1.0 - block_obj_alice.state.stats['avg_size'] / num_recs_alice
         rg_min = 1.0 - block_obj_alice.state.stats['min_size'] / num_recs_alice
-
         print('RG Max={}'.format(rg_max))
         print('RG Avg={}'.format(rg_avg))
         print('RG Min={}'.format(rg_min))
+
+        # obtain quality guarantee
+        num_blocks_per_record = block_obj_alice.state.stats['num_of_blocks_per_rec']
+        qg_max = max(num_blocks_per_record)
+        qg_avg = sum(num_blocks_per_record) / len(num_blocks_per_record)
+        print('QG MAX={}'.format(qg_max))
+        print('QG AVG={}'.format(qg_avg))
 
         # build final blocks
         start_time = time.time()
@@ -127,16 +137,23 @@ def experiment():
         l_rg_min.append(rg_min)
         l_rg_avg.append(rg_avg)
         l_rr.append(rr)
+        l_pc.append(pc)
+        l_qg_max.append(qg_max)
+        l_qg_avg.append(qg_avg)
 
-    df = pd.DataFrame(dict(MAX_RATIO=max_ratio, RG_MAX=l_rg_max, RG_AVG=l_rg_avg, RG_MIN=l_rg_min, RR=l_rr))
+    df = pd.DataFrame(dict(MAX_RATIO=max_ratio, RG_MAX=l_rg_max, RG_AVG=l_rg_avg, RG_MIN=l_rg_min, RR=l_rr, PC=l_pc,
+                           QG_MAX=l_qg_max, QG_AVG=l_qg_avg))
     print(df)
-    df.to_csv('rg_vs_rr_n={}.csv'.format(num_recs_alice), index=False)
+    if mod:
+        filename = 'rg_vs_rr_with_mod_n={}.csv'.format(num_recs_alice)
+    else:
+        filename = 'rg_vs_rr_no_mod_n={}.csv'.format(num_recs_alice)
+    df.to_csv(filename, index=False)
 
 
 if __name__ == '__main__':
-    mode = sys.argv[1]
-    if mode == 'draw':
-        filename = sys.argv[2]
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
         corr_rg_rr(filename)
     else:
         experiment()

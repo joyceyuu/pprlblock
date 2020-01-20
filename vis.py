@@ -5,23 +5,23 @@ import sys
 
 COLORS = {
     'k-nn': 'tab:cyan',
-    'snc-3p-sim': 'tab:blue',
-    'snc-3p-size': 'tab:orange',
+    'snc-3p': 'tab:blue',
+    # 'snc-3p-size': 'tab:orange',
     'hlsh': 'tab:green',
     'snc-2p': 'tab:purple',
     'hclust': 'tab:brown',
-    'p-sig': 'tab:pink',
+    'p3-sig': 'tab:pink',
     'lambda-LSH': 'tab:olive',
 }
 
 SHAPES = {
     'k-nn': 'o',
-    'snc-3p-sim': 'v',
-    'snc-3p-size': 's',
+    'snc-3p': 'v',
+    # 'snc-3p-size': 's',
     'hlsh': 'D',
     'snc-2p': '*',
     'hclust': '8',
-    'p-sig': 'X',
+    'p3-sig': 'X',
     'lambda-LSH': 'p',
 }
 
@@ -103,7 +103,6 @@ def draw_time(res):
         tot_time = dtime + ltime
         pl.plot(i, tot_time, marker=marker, label=name, color=color)
         pl.text(i, tot_time, name, fontsize=8)
-    methods = res['Method'].values
     pl.xticks(np.arange(n), methods)
     pl.title('Total Running Time (Log-Scale)')
     pl.yscale('log')
@@ -155,19 +154,27 @@ def corr_rg_rr(fname):
     rg_max = df['RG_MAX'].values
     rg_min = df['RG_MIN'].values
     rg_avg = df['RG_AVG'].values
+    size = fname.split('.csv')[0].split('n=')[-1]
     rr = df['RR'].values
     pl.figure(figsize=(8, 6))
-    pl.plot(rg_max, rr, label='RG_MAX')
-    pl.plot(rg_avg, rr, label='RG_AVG')
-    pl.plot(rg_min, rr, label='RG_MIN')
+    pl.scatter(rg_max, rr, label='RG_MAX')
     pl.grid()
     pl.legend()
     pl.title('Reduction Guarantee versus Reduction Ratio')
     pl.xlabel('Reduction Guarantee')
     pl.ylabel('Reduction Ratio')
-    # pl.xscale('log')
-    pl.show()
+    pl.savefig('figures/corr_rr_rg_4611_nomod.eps')
 
+    qg_avg = df['QG_AVG'].values
+    pc = df['PC'].values
+    pl.figure(figsize=(8, 6))
+    pl.scatter(qg_avg, pc, label='QG_AVG')
+    pl.grid()
+    pl.legend()
+    pl.title('Quality Guarantee versus Pair Completeness')
+    pl.xlabel('Quality Guarantee')
+    pl.ylabel('Pair Completeness')
+    pl.savefig('figures/corr_pc_qg_{}_nomod.eps'.format(size))
 
 if __name__ == '__main__':
     filename = sys.argv[1]
@@ -184,24 +191,20 @@ if __name__ == '__main__':
     draw_errorbar(len(res), res, alice, 'Alice')
     pl.tight_layout()
     pl.savefig('figures/Block_Size_Boxplot_Alice_{}.eps'.format(n))
-    pl.savefig('figures/Block_Size_Boxplot_Alice_{}.pdf'.format(n))
 
     # pl.subplot(2, 2, 2)
 
     pl.figure(figsize=(6, 6))
     draw_errorbar(len(res), res, bob, 'Bob')
     pl.savefig('figures/Block_Size_Boxplot_Bob_{}.eps'.format(n))
-    pl.savefig('figures/Block_Size_Boxplot_Bob_{}.pdf'.format(n))
 
     # pl.subplot(2, 2, 3)
     pl.figure()
     draw_ratios(res)
     pl.savefig('figures/RR_versus_PC_{}.eps'.format(n))
-    pl.savefig('figures/RR_versus_PC_{}.pdf'.format(n))
 
     # pl.subplot(2, 2, 4)
     pl.figure()
     draw_time(res)
     pl.tight_layout()
     pl.savefig('figures/Total_Running_Time_{}.eps'.format(n))
-    pl.savefig('figures/Total_Running_Time_{}.pdf'.format(n))
