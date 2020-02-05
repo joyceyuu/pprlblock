@@ -2,6 +2,37 @@
 
 Python routines for private indexing/blocking for PPRL (Privacy Preserving Record Linkage)
 
+### Depdencency
+
+You can install the following dependencies with 
+
+`pip install -r requirements.txt`
+
+```text
+bitarray==1.2.0
+blocklib==0.0.3
+cycler==0.10.0
+decorator==4.4.0
+Fuzzy==1.2.2
+jedi==0.15.1
+json5==0.8.5
+jsonschema==3.1.1
+matplotlib==3.1.1
+memory-profiler==0.55.0
+notebook==6.0.1
+numpy==1.17.2
+pandas==0.25.1
+scipy==1.3.1
+tqdm==4.36.1
+```
+
+### Main Script
+The main comparison scrips is in `comp_pb.py`. Firstly specify your datasets in 
+`get_experiment_data.py`. Then run
+
+```python comp_pb.py no```
+where no means no modification.
+
 ### Six private blocking/indexing methods:
 1. Three-party k-nearest neighbour based clustering (Kar12 kNN)
   * Reference table based k-anonymous private blocking
