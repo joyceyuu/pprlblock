@@ -89,7 +89,7 @@ for (alice_data_set, bob_data_set) in data_sets_pairs:
     psigarisk, psigbrisk = psig.disclosure_risk()
     # draw_risk(arisk, brisk, 'P-Sig', alice_num_recs)
 
-    assess_results.append(['psig',
+    assess_results.append(['p3-sig',
         alice_num_recs, bob_num_recs, num_ref_val, K,
         dbo_time, lu_time, rr, pc, pq,
         a_min_blk, a_med_blk, a_max_blk, a_avg_blk, a_std_dev,

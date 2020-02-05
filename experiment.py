@@ -44,6 +44,7 @@ def match(file_alice, file_bob, config):
     return dbo_time, lu_time, num_blocks, rr, pc, num_recs_alice, block_obj_alice, block_obj_bob
 
 
+
 def get_block_stats(block_obj):
     """Get block stats from block object."""
     # gather statistics
